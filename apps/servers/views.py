@@ -14,7 +14,7 @@ from utils.mixin_utils import LoginRequiredMixin
 
 
 # 定义首页视图
-class IndexView(LoginRequiredMixin, View):
+class IndexView(View):
     def get(self, request):
         total = Server.objects.count()
         zctype_groups = Server.objects.values("zctype__zctype").annotate(zctype_num=Count("zctype")).all().\
@@ -23,7 +23,7 @@ class IndexView(LoginRequiredMixin, View):
 
 
 # 资产列表
-class ServerListView(LoginRequiredMixin, View):
+class ServerListView(View):
     def get(self, request):
         search = request.GET.get('search')
         if search:

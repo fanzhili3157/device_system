@@ -26,8 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pure_pagination',
-    'users',
-    #'devices',
+    'users'
+    'devices',
 ]
 
 MIDDLEWARE = [

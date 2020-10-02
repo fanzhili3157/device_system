@@ -16,11 +16,11 @@ from utils.mixin_utils import LoginRequiredMixin
 # 定义首页视图
 class IndexView(View):
     def get(self, request):
-        pass
-#        total = Server.objects.count()
-#        device_groups = Server.objects.values("zctype__zctype").annotate(zctype_num=Count("zctype")).all().\
-#            order_by('-zctype_num', 'zctype__zctype')
-#        return render(request, 'servers/index.html', {'zctype_groups': device_groups, 'total': total})
+
+        total = Device.objects.count()
+        device_groups = Device.objects.values("device_type__device_type").annotate(device_type_num=Count("device_type")).all().\
+            order_by('-device_type_num', 'device_type__device_type')
+        return render(request, 'servers/index.html', {'device_type_groups': device_groups, 'total': total})
 
 
 # 资产列表

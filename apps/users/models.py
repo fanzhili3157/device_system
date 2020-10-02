@@ -3,10 +3,21 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+class Deparment(models.Model):
+    department_name = models.CharField(max_length=20, verbose_name='部门名称')
+
+    class Meta:
+        verbose_name = '部门信息'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.department_name
+
 
 # 定义用户模型，添加额外的字段
 class UserProfile(AbstractUser):
-    department = models.ForeignKey('users.Deparment',on_delete=models.CASCADE)
+    #department = models.ForeignKey('users.Deparment',on_delete=models.CASCADE,blank=True)
+    department = models.CharField(max_length=12, verbose_name='部门信息', blank=True)
     seat = models.CharField(max_length=12, verbose_name='工位信息', blank=True)
     mobile = models.CharField(max_length=11, verbose_name='手机号码', blank=True)
     email = models.CharField(max_length=15, verbose_name='邮箱', blank=True)
@@ -39,12 +50,5 @@ class UserOperateLog(models.Model):
     def __str__(self):
         return self.username + '.' + self.type
 
-class Deparment(models.Model):
-    department_name = models.CharField(max_length=20, verbose_name='部门名称')
 
-    class Meta:
-        verbose_name = '部门信息'
-        verbose_name_plural = verbose_name
 
-    def __str__(self):
-        return self.department_name

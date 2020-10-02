@@ -4,13 +4,13 @@ from .views import ServerListView, ServerAddView, ServerDetailView, ServerModify
 from .views import TypeListView, TypeAddView, TypeDetailView, TypeModifyView
 
 urlpatterns = [
-    # 资产url
-    path('server/list/', ServerListView.as_view(), name='server_list'),
-    path('server/add/', ServerAddView.as_view(), name='server_add'),
-    path('server/detail/<int:server_id>/', ServerDetailView.as_view(), name='server_detail'),
-    path('server/modify/', ServerModifyView.as_view(), name='server_modify'),
-    path('server/delete/<int:server_id>/', ServerDeleteView.as_view(), name='server_delete'),
-    path('server/export/', ServerExportView.as_view(), name='server_export'),
+    # 设备url
+    path('device/list/', ServerListView.as_view(), name='server_list'),
+    path('device/add/', ServerAddView.as_view(), name='server_add'),
+    path('device/detail/<int:device_id>/', ServerDetailView.as_view(), name='server_detail'),
+    path('device/modify/', ServerModifyView.as_view(), name='server_modify'),
+    path('device/delete/<int:server_id>/', ServerDeleteView.as_view(), name='server_delete'),
+    path('device/export/', ServerExportView.as_view(), name='server_export'),
 
     # 资产类型url
     path('type/list/', TypeListView.as_view(), name='type_list'),

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}设备管理 - 添加用户{% endblock %}
+{% block title %}添加用户{% endblock %}
 {% block custome_css %}
     <link rel="stylesheet" href="{% static 'servers/css/server-add.css' %}">
 {% endblock %}
@@ -10,22 +10,26 @@
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'users:user_add' %}" method="post">
             <div class="form-list">
-                <span>*姓名</span><input {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" name="username"/>
+                <span>*姓名</span>
+                <select {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" name="username">
+                    <option style="display: none;" disabled selected>请选择</option>
+                    {% for department in department_lists %}
+                        <option value="{{ department.id }}">{{ department.department_name }}</option>
+                    {% endfor %}
+                </select>
+
             </div>
             <div class="form-list">
-                <span>工号</span><input {% if userinfo_form.errors.staff_no %}class="input-error"{% endif %} type="text" name="staff_no"  placeholder="不超过15个字符"/>
+                <span>*部门</span><input {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" placeholder=""/>
             </div>
             <div class="form-list">
-                <span>部门</span><input {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" placeholder="不超过15个字符"/>
+                <span>工位信息</span><input {% if userinfo_form.errors.seat %}class="input-error"{% endif %} type="text" name="seat" placeholder=""/>
             </div>
             <div class="form-list">
-                <span>办公电话</span><input {% if userinfo_form.errors.bg_telephone %}class="input-error"{% endif %} type="text" name="bg_telephone" placeholder="不超过12个字符，区号用-隔开"/>
+                <span>联系方式</span><input {% if userinfo_form.errors.mobile %}class="input-error"{% endif %} type="text" name="mobile" placeholder=""/>
             </div>
             <div class="form-list">
-                <span>手机号码</span><input {% if userinfo_form.errors.mobile %}class="input-error"{% endif %} type="text" name="mobile" placeholder="不超过11个字符"/>
-            </div>
-            <div class="form-list">
-                <span>公司邮箱</span><input type="text" name="email" placeholder="不超过30个字符"/>
+                <span>公司邮箱</span><input type="text" name="email" placeholder=""/>
             </div>
             <div class="form-list">
                 <span>管理员</span>

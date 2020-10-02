@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pure_pagination',
     'users',
-    'servers',
+    #'devices',
 ]
 
 MIDDLEWARE = [
@@ -40,7 +40,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'zcgl.urls'
+ROOT_URLCONF = 'device_sys.urls'
 
 TEMPLATES = [
     {
@@ -58,12 +58,12 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'zcgl.wsgi.application'
+WSGI_APPLICATION = 'device_sys.wsgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zcgl',
+        'NAME': 'device_sys',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

@@ -21,4 +21,9 @@ class UserInfoForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['staff_no', 'department', 'isadmin', 'seat', 'mobile','is_superuser','is_staff']
+        fields = ['department', 'seat', 'mobile','email', 'isadmin','is_staff']
+
+
+# 定义添加，修改部门时表单验证
+class DepartmentInfoForm(forms.ModelForm):
+    department_name = forms.CharField(required=True)

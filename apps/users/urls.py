@@ -3,7 +3,7 @@ from django.urls import path
 from .views import UserLoginView, UserLogoutView
 from .views import UserListView, UserAddView, UserDetailView, UserModifyView, UserResetPwd, UserDeleteView
 from .views import UserPwdModifyView, UserExportView, UserOperateView
-from .views import DepartmentListView
+from .views import DepartmentListView,DepartmentAddView,DepartmentModifyView,DepartmentDeleteView
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='user_login'),
@@ -18,7 +18,14 @@ urlpatterns = [
     path('user/delete/<int:user_id>/', UserDeleteView.as_view(), name='user_delete'),
     path('user/export/', UserExportView.as_view(), name='user_export'),
     path('user/pwdmodify/', UserPwdModifyView.as_view(), name='user_pwd_modify'),  #  该url为用户修改自身密码
+
+    #部门相关url
     path('department/list/', DepartmentListView.as_view(), name='department_list'),
-    # 定义用户操作url
+    path('department/add/',DepartmentAddView.as_view(),name='department_add'),
+    path('department/modify/',DepartmentModifyView.as_view(),name='department_modify'),
+    path('department/delete/<int:deparment_id>',DepartmentDeleteView.as_view(),name='department_delete'),
+
+
+    # 定义操作日志url
     path('user/operate_log/', UserOperateView.as_view(), name='operate_log'),
 ]

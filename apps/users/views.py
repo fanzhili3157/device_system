@@ -8,9 +8,9 @@ from django.db.models import Q
 import django_excel as excel
 from pure_pagination import Paginator, PageNotAnInteger
 
-from .models import UserProfile, UserOperateLog
-from .forms import LoginForm, UserPwdModifyForm, UserInfoForm
-from zcgl.settings import per_page
+from .models import UserProfile, UserOperateLog,Deparment
+from .forms import LoginForm, UserPwdModifyForm, UserInfoForm,DepartmentInfoForm
+from device_sys.settings import per_page
 from utils.mixin_utils import LoginRequiredMixin
 
 # 定义普通用户初始密码
@@ -231,6 +231,51 @@ class DepartmentListView(LoginRequiredMixin,View):
         p_users = p.page(page)
         start = (int(page) - 1) * per_page  # 避免分页后每行数据序号从1开始
         return render(request, 'users/deparment_list.html', {'p_users': p_users, 'start': start, 'search': search})
+
+class DepartmentAddView(LoginRequiredMixin,View):
+    def get(self, request):
+        return render(request, 'users/department_add.html')
+
+    def post(self, request):
+        department_form = DepartmentInfoForm(request.POST)
+        if department_form.is_valid():
+            department_name = request.POST.get('department_name').strip()
+
+            user = Deparment.objects.filter(department_name=department_name)
+            if user:
+                return render(request, 'users/department_add.html', {'msg': '部门 ' + department_name + ' 已存在！'})
+            else:
+                new_department = Deparment(department_name=department_name)
+                new_department.save()
+                return HttpResponseRedirect((reverse('users:department_list')))
+        else:
+            return render(request, 'users/department_add.html', {'msg': '输入错误！', 'department_form': department_form})
+
+class DepartmentModifyView(LoginRequiredMixin,View):
+    def post(self, request):
+        department_form = DepartmentInfoForm(request.POST)
+        department_id = int(request.POST.get('department_id'))
+        department = Deparment.objects.get(id=department_id)
+        if department_form.is_valid():
+            department_name = request.POST.get('username').strip()
+            other_user = UserProfile.objects.filter(~Q(id=department_id), department_name=department_name)
+            # 如果修改，判断是否冲突
+            if other_user:
+                return render(request, 'users/department_modify.html', {'department': department, 'msg': department_name + '已存在！'})
+            else:
+                department.department_name = request.POST.get('department_name').strip()
+
+                department.save()
+                return HttpResponseRedirect((reverse('users:user_list')))
+        else:
+            return render(request, 'users/department_modify.html', {'department': department, 'msg': '输入错误！',
+                                                              'department_form': department_form})
+
+class DepartmentDeleteView(LoginRequiredMixin,View):
+    def get(self, request, department_id):
+        department = Deparment.objects.get(id=department_id)
+        department.delete()
+        return HttpResponseRedirect((reverse('users:department_list')))
 
 # 定义全局404
 def page_not_found(request):

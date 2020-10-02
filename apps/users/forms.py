@@ -21,4 +21,4 @@ class UserInfoForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['staff_no', 'department', 'isadmin', 'bg_telephone', 'mobile']
+        fields = ['staff_no', 'department', 'isadmin', 'seat', 'mobile','is_superuser','is_staff']

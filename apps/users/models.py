@@ -10,7 +10,7 @@ class UserProfile(AbstractUser):
     department = models.CharField(max_length=15, verbose_name='部门', blank=True)
     isadmin = models.CharField(max_length=10, choices=(('1', '是'), ('0', '否')),
                                verbose_name='是否管理员', default='0', blank=True)
-    bg_telephone = models.CharField(max_length=12, verbose_name='办公电话', blank=True)
+    seat = models.CharField(max_length=12, verbose_name='工位信息', blank=True)
     mobile = models.CharField(max_length=11, verbose_name='手机号码', blank=True)
     is_superuser = models.IntegerField(verbose_name='是否超级管理员', default=0)
     is_staff = models.CharField(max_length=10, choices=(('1', '是'), ('0', '否')),
@@ -39,3 +39,13 @@ class UserOperateLog(models.Model):
 
     def __str__(self):
         return self.username + '.' + self.type
+
+class Deparment(models.Model):
+    department_name = models.CharField(max_length=20, verbose_name='部门名称')
+
+    class Meta:
+        verbose_name = '部门信息'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.department_name

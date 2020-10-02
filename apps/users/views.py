@@ -76,9 +76,7 @@ class UserListView(LoginRequiredMixin, View):
         search = request.GET.get('search')
         if search:
             search = request.GET.get('search').strip()
-            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(staff_no__icontains=search)
-                                               | Q(department__icontains=search) | Q(bg_telephone__icontains=search)
-                                               | Q(mobile__icontains=search) | Q(email__icontains=search),
+            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__icontains=search),
                                                is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
         else:
             users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
@@ -105,7 +103,7 @@ class UserAddView(LoginRequiredMixin, View):
             username = request.POST.get('username').strip()
             staff_no = request.POST.get('staff_no').strip()
             department = request.POST.get('department').strip()
-            bg_telephone = request.POST.get('bg_telephone').strip()
+            seat = request.POST.get('seat').strip()
             mobile = request.POST.get('mobile').strip()
             email = request.POST.get('email').strip()
             isadmin = request.POST.get('isadmin')
@@ -114,7 +112,7 @@ class UserAddView(LoginRequiredMixin, View):
                 return render(request, 'users/user_add.html', {'msg': '用户 '+username+' 已存在！'})
             else:
                 new_user = UserProfile(username=username, staff_no=staff_no, password=make_password(pwd), department=department,
-                                       bg_telephone=bg_telephone, mobile=mobile, email=email, isadmin=isadmin)
+                                       seat=seat, mobile=mobile, email=email, isadmin=isadmin)
                 new_user.save()
                 return HttpResponseRedirect((reverse('users:user_list')))
         else:
@@ -144,7 +142,7 @@ class UserModifyView(LoginRequiredMixin, View):
                 user.username = request.POST.get('username').strip()
                 user.staff_no = request.POST.get('staff_no').strip()
                 user.department = request.POST.get('department').strip()
-                user.bg_telephone = request.POST.get('bg_telephone').strip()
+                user.seat = request.POST.get('seat').strip()
                 user.mobile = request.POST.get('mobile').strip()
                 user.email = request.POST.get('email').strip()
                 user.isadmin = request.POST.get('isadmin')
@@ -180,12 +178,12 @@ class UserExportView(LoginRequiredMixin, View):
         if search:
             search = request.GET.get('search').strip()
             users = UserProfile.objects.filter(Q(username__icontains=search) | Q(staff_no__icontains=search)
-                                               | Q(department__icontains=search) | Q(bg_telephone__icontains=search)
+                                               | Q(department__icontains=search) | Q(seat__icontains=search)
                                                | Q(mobile__icontains=search) | Q(email__icontains=search,
                                                is_superuser=0)).order_by('-is_staff', 'staff_no')
         else:
             users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')
-        columns_names = ['id', 'username', 'staff_no', 'department', 'bg_telephone', 'mobile', 'email', 'is_staff']
+        columns_names = ['id', 'username', 'staff_no', 'department', 'seat', 'mobile', 'email', 'is_staff']
         return excel.make_response_from_query_sets(users, columns_names, 'xls', file_name='人员列表')
 
 
@@ -212,6 +210,27 @@ class UserOperateView(LoginRequiredMixin, View):
         return render(request, 'users/operate_log.html', {'operate_logs': p_operate_logs, 'start': start,
                                                           'search': search})
 
+class DepartmentListView(LoginRequiredMixin,View):
+    def get(self, request):
+        search = request.GET.get('search')
+        if search:
+            search = request.GET.get('search').strip()
+            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(staff_no__icontains=search)
+                                               | Q(department__icontains=search) | Q(bg_telephone__icontains=search)
+                                               | Q(mobile__icontains=search) | Q(email__icontains=search),
+                                               is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+        else:
+            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+
+        # 分页功能实现
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(users, per_page=per_page, request=request)
+        p_users = p.page(page)
+        start = (int(page) - 1) * per_page  # 避免分页后每行数据序号从1开始
+        return render(request, 'users/deparment_list.html', {'p_users': p_users, 'start': start, 'search': search})
 
 # 定义全局404
 def page_not_found(request):

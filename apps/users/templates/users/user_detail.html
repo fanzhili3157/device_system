@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}资产管理 - 人员详情{% endblock %}
+{% block title %}用户详情{% endblock %}
 {% block custome_css %}
     <link rel="stylesheet" href="{% static 'servers/css/server-add.css' %}">
     <link rel="stylesheet" href="{% static 'servers/css/server-detail.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
-        <p class="content-note1">修改人员<span class="content-note2"> (标注为*为必填项)</span></p>
+        <p class="content-note1">修改用户<span class="content-note2"> (标注为*为必填项)</span></p>
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'users:user_modify' %}" method="post">
             <input type="hidden" id="user_id" name="user_id" value="{{ user.id }}"/>
             <div class="form-list">
-                <span>*姓名</span><input {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" id="username" name="username" value="{{ user.username }}"/>
+                <span>*用户名</span><input {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" id="username" name="username" value="{{ user.username }}"/>
             </div>
             <div class="form-list">
                 <span>工号</span><input {% if userinfo_form.errors.staff_no %}class="input-error"{% endif %} type="text" id="staff_no" name="staff_no" value="{{ user.staff_no }}"/>
             </div>
             <div class="form-list">
-                <span>部门</span><input {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" value="{{ user.department }}" placeholder="不超过15个字符"/>
+                <span>所在部门</span><input {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" value="{{ user.department }}" placeholder="不超过15个字符"/>
             </div>
             <div class="form-list">
-                <span>办公电话</span><input {% if userinfo_form.errors.bg_telephone %}class="input-error"{% endif %} type="text" name="bg_telephone" value="{{ user.bg_telephone }}" placeholder="不超过12个字符，区号用-隔开"/>
+                <span>工位信息</span><input {% if userinfo_form.errors.bg_telephone %}class="input-error"{% endif %} type="text" name="bg_telephone" value="{{ user.bg_telephone }}" placeholder="不超过12个字符，区号用-隔开"/>
             </div>
             <div class="form-list">
                 <span>手机号码</span><input {% if userinfo_form.errors.mobile %}class="input-error"{% endif %} type="text" name="mobile" value="{{ user.mobile }}" placeholder="不超过11个字符"/>
@@ -57,7 +57,7 @@
 {#                 <button class="form-button form-button-del" type="button" onclick="btn_delete()">删除</button>#}
 {#            </div>#}
             <div class="form-list">
-                 <button class="form-button form-button-pwdreset" type="button" onclick="btn_pwdreset()">重置密码</button>
+                 <button class="form-button form-button-pwdreset" type="button" onclick="btn_delete()">删除用户</button>
             </div>
             {% csrf_token %}
         </form>

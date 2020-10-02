@@ -18,11 +18,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for zctype_group in zctype_groups %}
+                    {% for _group in devicetype_groups %}
                         <tr>
                             <td class="table-line">{{ forloop.counter }}</td>
-                            <td>{{ zctype_group.zctype__zctype }}</td>
-                            <td class="table-line">{{ zctype_group.zctype_num }}</td>
+                            <td>{{ devicetype_group.device_type__device_type }}</td>
+                            <td class="table-line">{{ devicetype_group.devicetype_num }}</td>
                         </tr>
                     {% endfor %}
                     <tr>

@@ -3,7 +3,20 @@ from datetime import datetime
 from django.db import models
 
 
+# 定义设备类型model
+class DeviceType(models.Model):
+    device_type = models.CharField(max_length=20, verbose_name='设备品牌和型号')
+    device_system = models.CharField(max_length=20, verbose_name='设备操作系统')
+    device_cpu = models.CharField(max_length=20, verbose_name='cpu')
+    device_men = models.CharField(max_length=20, verbose_name='内存')
+    device_res = models.CharField(max_length=20, verbose_name='分辨率')
 
+    class Meta:
+        verbose_name = '设备品牌和型号'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.device_type
 
 # 定义资产model
 class Device(models.Model):
@@ -29,20 +42,7 @@ class Device(models.Model):
         return self.device_type
 
 
-# 定义设备类型model
-class DeviceType(models.Model):
-    device_type = models.CharField(max_length=20, verbose_name='设备品牌和型号')
-    device_system = models.CharField(max_length=20, verbose_name='设备操作系统')
-    device_cpu = models.CharField(max_length=20, verbose_name='cpu')
-    device_men = models.CharField(max_length=20, verbose_name='内存')
-    device_res = models.CharField(max_length=20, verbose_name='分辨率')
 
-    class Meta:
-        verbose_name = '设备品牌和型号'
-        verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.device_type
 
 
 # 定义设备使用历史model

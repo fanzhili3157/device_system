@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}资产管理 - 资产类型详情{% endblock %}
+{% block title %}资产类型详情{% endblock %}
 {% block custome_css %}
-    <link rel="stylesheet" href="{% static 'servers/css/server-add.css' %}">
-    <link rel="stylesheet" href="{% static 'servers/css/server-detail.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-add.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-detail.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
         <p class="content-note1">修改资产类型<span class="content-note2"> (标注为*为必填项)</span></p>
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'servers:type_modify' %}" method="post">
-            <input type="hidden" id="type_id" name="type_id" value="{{ server_type.id }}"/>
+            <input type="hidden" id="type_id" name="type_id" value="{{ device_type.id }}"/>
             <div class="form-list">
                 <span>*资产类型</span>
-                <input {% if servertype_form.errors.zctype %}class="input-error"{% endif %} type="text" name="zctype" value="{{ server_type.zctype }}" placeholder="不超过20个字符"/>
+                <input {% if devicetype_form.errors.device_type %}class="input-error"{% endif %} type="text" name="device_type" value="{{ devive_type.devive_type }}" placeholder=""/>
             </div>
             {% if msg %}
                 <div class="error">{{ msg }}</div>
@@ -32,7 +32,7 @@
 {% block custome_js %}
     <script>
         function btn_cancel() {
-            location.href = "{% url 'servers:type_list' %}";
+            location.href = "{% url 'devices:device_list' %}";
         }
     </script>
 {% endblock %}

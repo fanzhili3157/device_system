@@ -3,7 +3,7 @@ from django import forms
 from .models import Device, DeviceType
 
 
-# 定义资产表单验证
+# 定义设备表单验证
 class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
@@ -11,9 +11,9 @@ class DeviceForm(forms.ModelForm):
                   'comment']
 
 
-# 定义资产类型表单验证
+# 定义设备类型表单验证
 class DeviceTypeForm(forms.ModelForm):
     class Meta:
         model = DeviceType
-        fields = ['device_type']
+        fields = ['device_type','device_system','device_cpu','device_men']
 

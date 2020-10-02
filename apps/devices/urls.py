@@ -1,16 +1,16 @@
 from django.urls import path
 
-from .views import ServerListView, ServerAddView, ServerDetailView, ServerModifyView, ServerDeleteView, ServerExportView
+from .views import DeviceListView, DeviceAddView, DeviceDetailView, DeviceModifyView, DeviceDeleteView
 from .views import TypeListView, TypeAddView, TypeDetailView, TypeModifyView
 
 urlpatterns = [
     # 设备url
-    path('device/list/', ServerListView.as_view(), name='server_list'),
-    path('device/add/', ServerAddView.as_view(), name='server_add'),
-    path('device/detail/<int:device_id>/', ServerDetailView.as_view(), name='server_detail'),
-    path('device/modify/', ServerModifyView.as_view(), name='server_modify'),
-    path('device/delete/<int:server_id>/', ServerDeleteView.as_view(), name='server_delete'),
-    path('device/export/', ServerExportView.as_view(), name='server_export'),
+    path('device/list/', DeviceListView.as_view(), name='device_list'),
+    path('device/add/', DeviceAddView.as_view(), name='device_add'),
+    path('device/detail/<int:device_id>/', DeviceDetailView.as_view(), name='device_detail'),
+    path('device/modify/', DeviceModifyView.as_view(), name='device_modify'),
+    path('device/delete/<int:device_id>/', DeviceDeleteView.as_view(), name='device_delete'),
+    #path('device/export/', ServerExportView.as_view(), name='server_export'),
 
     # 资产类型url
     path('type/list/', TypeListView.as_view(), name='type_list'),

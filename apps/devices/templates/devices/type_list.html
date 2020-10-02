@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}资产管理 - 资产类型{% endblock %}
 {% block custome_css %}
-    <link rel="stylesheet" href="{% static 'servers/css/server-list.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-list.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
@@ -17,10 +17,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for servertype in server_types %}
+                {% for devicetype in device_types %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><a href="{% url 'servers:type_detail' servertype.id %}">{{ servertype.zctype }}</a></td>
+                        <td><a href="{% url 'devices:type_detail' devicetype.id %}">{{ devicetype.device_type }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -31,7 +31,7 @@
     <script>
         var btn_server_add = document.getElementById("btn_add");
         btn_server_add.onclick = function () {
-            location.href = "{% url 'servers:type_add' %}";
+            location.href = "{% url 'devices:type_add' %}";
         };
     </script>
 {% endblock %}

@@ -17,6 +17,7 @@
         <button class="button-insert" id="btn_add">添加部门</button>
         {# <button class="button-insert" id="btn_export_list">导出列表</button> #}
         <br/><br/>
+        <p>共计{{ p_departments.object_list|length }}条记录</p>
         <table class="table-list">
             <thead>
                 <tr>
@@ -29,9 +30,9 @@
                 {% for department in p_departments.object_list %}
                     <tr>
                         <td>{{ forloop.counter|add:start }}</td>
-                        <td><a href="{% url 'users:department_modify' department.id %}">{{ department.department_name }}</a></td>
-                        <td><a href="{% url 'users:department_modify' department.id %}">修改</a>
-                            <a href="">删除</a>
+                        <td><a href="{% url 'users:department_detail' department.id %}">{{ department.department_name }}</a></td>
+                        <td><a href="{% url 'users:department_detail' department.id %}"><button>修改</button></a>
+                            <button class="form-button-del"  onclick="btn_delete({{ department.id }})">删除</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -39,12 +40,12 @@
         </table>
         <div class="page">
             <ul class="pagination">
-                {% if p_deparments.has_previous %}
-                    <li><a href="?{{ p_deparments.previous_page_number.querystring }}">&laquo;</a></li>
+                {% if p_departments.has_previous %}
+                    <li><a href="?{{ p_departments.previous_page_number.querystring }}">&laquo;</a></li>
                 {% endif %}
-                {% for page in p_deparments.pages %}
+                {% for page in p_departments.pages %}
                     {% if page %}
-                        {% ifequal page p_deparments.number %}
+                        {% ifequal page p_departments.number %}
                             <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
                         {% else %}
                             <li><a href="?{{ page.querystring }}">{{ page }}</a></li>
@@ -53,8 +54,8 @@
                         <li>...</li>
                     {% endif %}
                 {% endfor %}
-                {% if p_deparments.has_next %}
-                    <li><a href="?{{ p_deparments.next_page_number.querystring }}">&raquo;</a></li>
+                {% if p_departments.has_next %}
+                    <li><a href="?{{ p_departments.next_page_number.querystring }}">&raquo;</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -67,11 +68,14 @@
             location.href = "{% url 'users:department_add' %}";
         };
 
-        var btn_export_list = document.getElementById("btn_export_list");
-        btn_export_list.onclick = function() {
-            var search = document.getElementById("search").value;
-            var url = "{% url 'users:user_export' %}";
-            location.href = url + '?search=' + search;
+
+        function btn_delete(department) {
+            var department_id = department;
+            var url = "{% url 'users:department_delete' 0 %}";
+            var conf = confirm("确定删掉该数据？");
+            if (conf) {
+                location.href = url.replace('0', department_id);
+            }
         }
     </script>
 {% endblock %}

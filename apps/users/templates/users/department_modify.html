@@ -10,7 +10,7 @@
         <p class="content-note1">修改部门<span class="content-note2"> (标注为*为必填项)</span></p>
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'users:department_modify' %}" method="post">
-            <input type="hidden" id="department_id" name="department_id" value="{{ user.id }}"/>
+            <input type="hidden" id="department_id" name="department_id" value="{{ department.id }}"/>
             <div class="form-list">
                 <span>*部门名称</span><input {% if department_form.errors.department_name %}class="input-error"{% endif %} type="text"
                                          id="department_name" name="department_name" value="{{ department.department_name }}"/>

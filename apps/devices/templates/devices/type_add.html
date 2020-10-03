@@ -12,6 +12,15 @@
             <div class="form-list">
                 <span>*设备类型</span><input {% if devicetype_form.errors.device_type %}class="input-error"{% endif %} type="text" name="device_type" placeholder=""/>
             </div>
+            <div class="form-list">
+                <span>*操作系统</span><input {% if devicetype_form.errors.device_type %}class="input-error"{% endif %} type="text" name="device_system" placeholder=""/>
+            </div>
+            <div class="form-list">
+                <span>*cpu型号</span><input {% if devicetype_form.errors.device_type %}class="input-error"{% endif %} type="text" name="device_cpu" placeholder=""/>
+            </div>
+            <div class="form-list">
+                <span>*屏幕</span><input {% if devicetype_form.errors.device_type %}class="input-error"{% endif %} type="text" name="device_res" placeholder=""/>
+            </div>
             {% if msg %}
                 <div class="error">{{ msg }}</div>
             {% endif %}

@@ -1,26 +1,42 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}资产管理 - 资产类型{% endblock %}
+{% block title %}设备类型{% endblock %}
 {% block custome_css %}
     <link rel="stylesheet" href="{% static 'devices/css/device-list.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
-        <p>资产类型列表</p>
+        <p>设备类型列表</p>
+        <div class="form-class">
+            <form action="" method="get">
+                <input id="search" class="form-text" type="text" placeholder="搜索..." name="search" value="{% if search %}{{ search }}{% endif %}"/>
+                <button class="form-submit" type="submit">
+                    <i class='fa fa-search' aria-hidden='true'></i>
+                </button>
+            </form>
+        </div>
         <button class="button-insert" id="btn_add">添加类型</button>
         <br/><br/>
-        <table class="table-list type-list">
+        <p>共计{{ device_types.object_list|length }}条记录</p>
+        <table class="table-list">
             <thead>
                 <tr>
                     <th>序号</th>
-                    <th>资产类型</th>
+                    <th>设备类型</th>
+                    <th>操作系统</th>
+                    <th>cpu型号</th>
+                    <th>屏幕</th>
                 </tr>
             </thead>
             <tbody>
-                {% for devicetype in device_types %}
+                {% for device in device_types.object_list %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="{% url 'devices:type_detail' devicetype.id %}">{{ devicetype.device_type }}</a></td>
+                       <td>{{ forloop.counter|add:start }}</td>
+                        <td><{{ device.device_type }}</td>
+                        <td>{{ device.device_system }}</td>
+                        <td>{{ device.device_cpu }}</td>
+                        <td>{{ device.device_res }}</td>
+
                     </tr>
                 {% endfor %}
             </tbody>

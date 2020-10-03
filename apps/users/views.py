@@ -77,9 +77,9 @@ class UserListView(LoginRequiredMixin, View):
         if search:
             search = request.GET.get('search').strip()
             users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__icontains=search),
-                                               is_superuser=0).order_by('-is_staff')  # 排除超级管理员
+                                               is_superuser=0).order_by('-is_staff')
         else:
-            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')  # 排除超级管理员
+            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')
 
         # 分页功能实现
         try:
@@ -95,13 +95,14 @@ class UserListView(LoginRequiredMixin, View):
 # 用户添加
 class UserAddView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'users/user_add.html')
+        departments = Department.objects.all()
+        return render(request, 'users/user_add.html',{'department_lists':departments})
 
     def post(self, request):
         userinfo_form = UserInfoForm(request.POST)
+        print(userinfo_form)
         if userinfo_form.is_valid():
             username = request.POST.get('username').strip()
-            staff_no = request.POST.get('staff_no').strip()
             department = request.POST.get('department').strip()
             seat = request.POST.get('seat').strip()
             mobile = request.POST.get('mobile').strip()
@@ -111,7 +112,7 @@ class UserAddView(LoginRequiredMixin, View):
             if user:
                 return render(request, 'users/user_add.html', {'msg': '用户 '+username+' 已存在！'})
             else:
-                new_user = UserProfile(username=username, staff_no=staff_no, password=make_password(pwd), department=department,
+                new_user = UserProfile(username=username, password=make_password(pwd), department=department,
                                        seat=seat, mobile=mobile, email=email, isadmin=isadmin)
                 new_user.save()
                 return HttpResponseRedirect((reverse('users:user_list')))
@@ -122,16 +123,21 @@ class UserAddView(LoginRequiredMixin, View):
 # 用户详情
 class UserDetailView(LoginRequiredMixin, View):
     def get(self, request, user_id):
+        departments = Department.objects.all()
         user = UserProfile.objects.get(id=user_id)
-        return render(request, 'users/user_detail.html', {'user': user})
+        return render(request, 'users/user_detail.html', {'user': user,'department_lists': departments})
 
 
 # 用户修改
 class UserModifyView(LoginRequiredMixin, View):
+
     def post(self, request):
         userinfo_form = UserInfoForm(request.POST)
         user_id = int(request.POST.get('user_id'))
         user = UserProfile.objects.get(id=user_id)
+
+
+
         if userinfo_form.is_valid():
             username = request.POST.get('username').strip()
             other_user = UserProfile.objects.filter(~Q(id=user_id), username=username)
@@ -140,7 +146,6 @@ class UserModifyView(LoginRequiredMixin, View):
                 return render(request, 'users/user_detail.html', {'user': user, 'msg': username+'用户名已存在！'})
             else:
                 user.username = request.POST.get('username').strip()
-                user.staff_no = request.POST.get('staff_no').strip()
                 user.department = request.POST.get('department').strip()
                 user.seat = request.POST.get('seat').strip()
                 user.mobile = request.POST.get('mobile').strip()
@@ -227,8 +232,7 @@ class DepartmentListView(LoginRequiredMixin,View):
         p = Paginator(departments, per_page=per_page, request=request)
         p_departments = p.page(page)
         start = (int(page) - 1) * per_page  # 避免分页后每行数据序号从1开始
-        for dep in p_departments.object_list:
-            print(dep.id,dep.department_name)
+
         return render(request, 'users/department_list.html', {'p_departments': p_departments, 'start': start, 'search': search})
 
 class DepartmentAddView(LoginRequiredMixin,View):
@@ -250,30 +254,36 @@ class DepartmentAddView(LoginRequiredMixin,View):
         else:
             return render(request, 'users/department_add.html', {'msg': '输入错误！', 'department_form': department_form})
 
-class DepartmentModifyView(LoginRequiredMixin,View):
-    def get(self, request,department_id):
-        print(department_id)
+class DepartmentDetailView(LoginRequiredMixin,View):
+    def get(self,request,department_id):
         dep = Department.objects.get(id=department_id)
-        #return render(request,'users/department_modify.html', {'department': dep})
-        return HttpResponseRedirect(reverse('users:department_modify'),department=dep)
-    # def post(self, request):
-    #     department_form = DepartmentInfoForm(request.POST)
-    #     department_id = int(request.POST.get('department_id'))
-    #     department = Department.objects.get(id=department_id)
-    #     if department_form.is_valid():
-    #         department_name = request.POST.get('username').strip()
-    #         other_user = UserProfile.objects.filter(~Q(id=department_id), department_name=department_name)
-    #         # 如果修改，判断是否冲突
-    #         if other_user:
-    #             return render(request, 'users/department_modify.html', {'department': department, 'msg': department_name + '已存在！'})
-    #         else:
-    #             department.department_name = request.POST.get('department_name').strip()
-    #
-    #             department.save()
-    #             return HttpResponseRedirect((reverse('users:user_list')))
-    #     else:
-    #         return render(request, 'users/department_modify.html', {'department': department, 'msg': '输入错误！',
-    #                                                           'department_form': department_form})
+        return render(request, 'users/department_modify.html', {'department': dep})
+
+
+class DepartmentModifyView(LoginRequiredMixin,View):
+    # def get(self, request,department_id):
+    #     dep = Department.objects.get(id=department_id)
+    #     return render(request,'users/department_modify.html', {'department': dep})
+    #     return HttpResponseRedirect(reverse('users:department_modify'),department=dep)
+    def post(self, request):
+        department_form = DepartmentInfoForm(request.POST)
+        department_id = int(request.POST.get('department_id'))
+        print("dep id is:",department_id)
+        department = Department.objects.get(id=department_id)
+        if department_form.is_valid():
+            department_name = request.POST.get('department_name').strip()
+            other_dep = Department.objects.filter(~Q(id=department_id), department_name=department_name)
+            # 如果修改，判断是否冲突
+            if other_dep:
+                return render(request, 'users/department_modify.html', {'department': department, 'msg': department_name + '已存在！'})
+            else:
+                department.department_name = request.POST.get('department_name').strip()
+
+                department.save()
+                return HttpResponseRedirect((reverse('users:department_list')))
+        else:
+            return render(request, 'users/department_modify.html', {'department': department, 'msg': '输入错误！',
+                                                              'department_form': department_form})
 
 class DepartmentDeleteView(LoginRequiredMixin,View):
     def get(self, request, department_id):

@@ -3,7 +3,7 @@ from django.urls import path
 from .views import UserLoginView, UserLogoutView
 from .views import UserListView, UserAddView, UserDetailView, UserModifyView, UserResetPwd, UserDeleteView
 from .views import UserPwdModifyView, UserExportView, UserOperateView
-from .views import DepartmentListView,DepartmentAddView,DepartmentModifyView,DepartmentDeleteView
+from .views import DepartmentListView,DepartmentAddView,DepartmentModifyView,DepartmentDeleteView,DepartmentDetailView
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='user_login'),
@@ -22,7 +22,8 @@ urlpatterns = [
     #部门相关url
     path('department/list/', DepartmentListView.as_view(), name='department_list'),
     path('department/add/',DepartmentAddView.as_view(),name='department_add'),
-    path('department/modify/<int:department_id>',DepartmentModifyView.as_view(),name='department_modify'),
+    path('department/detial/<int:department_id>/',DepartmentDetailView.as_view(),name='department_detail'),
+    path('department/modify/',DepartmentModifyView.as_view(),name='department_modify'),
     path('department/delete/<int:department_id>',DepartmentDeleteView.as_view(),name='department_delete'),
 
 

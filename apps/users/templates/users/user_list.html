@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}部门列表{% endblock %}
+{% block title %}用户列表{% endblock %}
 {% block custome_css %}
 {% endblock %}
 {% block content %}
     <div class="content">
-        <p>人员列表</p>
+        <p>用户列表</p>
         <div class="form-class">
             <form action="" method="get">
                 <input id="search" class="form-text" type="text" placeholder="搜索..." name="search" value="{% if search %}{{ search }}{% endif %}"/>
@@ -14,17 +14,17 @@
                 </button>
             </form>
         </div>
-        <button class="button-insert" id="btn_add">添加人员</button>
+        <button class="button-insert" id="btn_add">添加用户</button>
         <button class="button-insert" id="btn_export_list">导出列表</button>
         <br/><br/>
+        <p>共计{{ p_users.object_list|length }}条记录</p>
         <table class="table-list">
             <thead>
                 <tr>
                     <th>序号</th>
                     <th>姓名</th>
-                    <th>工号</th>
                     <th>部门</th>
-                    <th>办公电话</th>
+                    <th>工位信息</th>
                     <th>手机号码</th>
                     <th>公司邮箱</th>
                     <th>管理员</th>
@@ -36,9 +36,8 @@
                     <tr>
                         <td>{{ forloop.counter|add:start }}</td>
                         <td><a href="{% url 'users:user_detail' user.id %}">{{ user.username }}</a></td>
-                        <td>{{ user.staff_no }}</td>
                         <td>{{ user.department }}</td>
-                        <td>{{ user.bg_telephone }}</td>
+                        <td>{{ user.seat }}</td>
                         <td>{{ user.mobile }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.get_isadmin_display }}</td>

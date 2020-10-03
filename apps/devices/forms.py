@@ -15,5 +15,5 @@ class DeviceForm(forms.ModelForm):
 class DeviceTypeForm(forms.ModelForm):
     class Meta:
         model = DeviceType
-        fields = ['device_type','device_system','device_cpu','device_men']
+        fields = ['device_type','device_system','device_cpu','device_res']
 

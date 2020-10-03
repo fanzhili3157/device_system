@@ -8,5 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', IndexView.as_view(), name='index'),
     path('users/', include(('users.urls', 'users'), namespace='users')),
-    path('servers/', include(('devices.urls', 'devices'), namespace='devices')),
+    path('devices/', include(('devices.urls', 'devices'), namespace='devices')),
 ]

@@ -253,6 +253,7 @@ class DeviceDeleteView(LoginRequiredMixin, View):
 class TypeListView(LoginRequiredMixin, View):
     def get(self, request):
         device_types = DeviceType.objects.all()
+        print(device_types)
         return render(request, 'devices/type_list.html', {'device_types': device_types})
 
 
@@ -263,15 +264,19 @@ class TypeAddView(LoginRequiredMixin, View):
 
     def post(self, request):
         device_type = request.POST.get('device_type').strip()
+        device_system = request.POST.get('device_system').strip()
+        device_cpu = request.POST.get('device_cpu').strip()
+        device_res = request.POST.get('device_res').strip()
         devicetype_form = DeviceTypeForm(request.POST)
         # 判断表单是否正确
         if devicetype_form.is_valid():
             other_devicetype = DeviceType.objects.filter(device_type=device_type)
-            # 判断是否已经存在了该zctype
+            # 判断是否已经存在了该类型
             if other_devicetype:
                 return render(request, 'devices/type_add.html', {'msg': device_type+' 已存在！'})
             else:
-                new_devicetype = DeviceType(device_type=device_type)
+                new_devicetype = DeviceType(device_type=device_type,device_system=device_system,device_cpu=device_cpu,
+                                            device_res=device_res)
                 new_devicetype.save()
                 return HttpResponseRedirect((reverse('devices:type_list')))
         else:

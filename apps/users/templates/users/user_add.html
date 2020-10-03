@@ -10,17 +10,16 @@
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'users:user_add' %}" method="post">
             <div class="form-list">
-                <span>*姓名</span>
-                <select {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" name="username">
-                    <option style="display: none;" disabled selected>请选择</option>
-                    {% for department in department_lists %}
-                        <option value="{{ department.id }}">{{ department.department_name }}</option>
-                    {% endfor %}
-                </select>
-
+                <span>*姓名</span><input {% if userinfo_form.errors.username %}class="input-error"{% endif %} type="text" name="username" placeholder=""/>
             </div>
             <div class="form-list">
-                <span>*部门</span><input {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" placeholder=""/>
+                <span>*部门</span>
+                <select {% if userinfo_form.errors.department %}class="input-error"{% endif %} type="text" name="department" >
+                    <option style="display: none;" disabled selected>请选择</option>
+                    {% for department in department_lists %}
+                        <option value="{{ department.department_name }}">{{ department.department_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-list">
                 <span>工位信息</span><input {% if userinfo_form.errors.seat %}class="input-error"{% endif %} type="text" name="seat" placeholder=""/>

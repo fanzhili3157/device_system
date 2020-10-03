@@ -2,13 +2,13 @@
 {% load static %}
 {% block title %}部门管理{% endblock %}
 {% block custome_css %}
-    <link rel="stylesheet" href="{% static 'servers/css/server-add.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-add.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
         <p class="content-note1">添加部门<span class="content-note2"> (标注为*为必填项)</span></p>
         <div style="clear:both"></div>
-        <form class="form-table" action="{% url 'users:user_add' %}" method="post">
+        <form class="form-table" action="{% url 'users:department_add' %}" method="post">
             <div class="form-list">
                 <span>*部门名称</span><input {% if department_form.errors.department_name %}class="input-error"{% endif %}
                                          type="text" name="department_name"/>
@@ -31,7 +31,7 @@
 {% block custome_js %}
     <script>
         function btn_cancel() {
-            location.href = "{% url 'users:user_list' %}";
+            location.href = "{% url 'users:department_list' %}";
         }
     </script>
 {% endblock %}

@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}部门修改{% endblock %}
 {% block custome_css %}
-    <link rel="stylesheet" href="{% static 'servers/css/server-add.css' %}">
-    <link rel="stylesheet" href="{% static 'servers/css/server-detail.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-add.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-detail.css' %}">
 {% endblock %}
 {% block content %}
     <div class="content">
@@ -43,8 +43,8 @@
         }
 
         function btn_delete() {
-            var user_id = document.getElementById("department_id").value;
-            var username = document.getElementById("department_name").value;
+            var department_id = document.getElementById("department_id").value;
+            var department_name = document.getElementById("department_name").value;
             var url = "{% url 'users:department_delete' 0 %}";
             var conf = confirm("确定删掉部门 "+department_name+" ？");
             if (conf) {
@@ -57,4 +57,3 @@
 {% endblock %}
 
 
-user_pwdreset

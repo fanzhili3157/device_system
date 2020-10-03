@@ -26,11 +26,11 @@
                 </tr>
             </thead>
             <tbody>
-                {% for user in p_users.object_list %}
+                {% for department in p_departments.object_list %}
                     <tr>
                         <td>{{ forloop.counter|add:start }}</td>
-                        <td><a href="{% url 'users:user_detail' user.id %}">{{ user.username }}</a></td>
-                        <td><a href="{% url 'users:user_detail' user.id %}">修改</a>
+                        <td><a href="{% url 'users:department_modify' department.id %}">{{ department.department_name }}</a></td>
+                        <td><a href="{% url 'users:department_modify' department.id %}">修改</a>
                             <a href="">删除</a>
                         </td>
                     </tr>
@@ -39,12 +39,12 @@
         </table>
         <div class="page">
             <ul class="pagination">
-                {% if p_users.has_previous %}
-                    <li><a href="?{{ p_users.previous_page_number.querystring }}">&laquo;</a></li>
+                {% if p_deparments.has_previous %}
+                    <li><a href="?{{ p_deparments.previous_page_number.querystring }}">&laquo;</a></li>
                 {% endif %}
-                {% for page in p_users.pages %}
+                {% for page in p_deparments.pages %}
                     {% if page %}
-                        {% ifequal page p_users.number %}
+                        {% ifequal page p_deparments.number %}
                             <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
                         {% else %}
                             <li><a href="?{{ page.querystring }}">{{ page }}</a></li>
@@ -53,8 +53,8 @@
                         <li>...</li>
                     {% endif %}
                 {% endfor %}
-                {% if p_users.has_next %}
-                    <li><a href="?{{ p_users.next_page_number.querystring }}">&raquo;</a></li>
+                {% if p_deparments.has_next %}
+                    <li><a href="?{{ p_deparments.next_page_number.querystring }}">&raquo;</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -64,7 +64,7 @@
     <script>
         var btn_person_add = document.getElementById("btn_add");
         btn_person_add.onclick = function () {
-            location.href = "{% url 'users:user_add' %}";
+            location.href = "{% url 'users:department_add' %}";
         };
 
         var btn_export_list = document.getElementById("btn_export_list");

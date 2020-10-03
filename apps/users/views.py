@@ -8,8 +8,8 @@ from django.db.models import Q
 import django_excel as excel
 from pure_pagination import Paginator, PageNotAnInteger
 
-from .models import UserProfile, UserOperateLog,Deparment
-from .forms import LoginForm, UserPwdModifyForm, UserInfoForm,DepartmentInfoForm
+from .models import UserProfile, UserOperateLog,Department
+from .forms import LoginForm, UserPwdModifyForm, UserInfoForm, DepartmentInfoForm
 from device_sys.settings import per_page
 from utils.mixin_utils import LoginRequiredMixin
 
@@ -77,9 +77,9 @@ class UserListView(LoginRequiredMixin, View):
         if search:
             search = request.GET.get('search').strip()
             users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__icontains=search),
-                                               is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+                                               is_superuser=0).order_by('-is_staff')  # 排除超级管理员
         else:
-            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')  # 排除超级管理员
 
         # 分页功能实现
         try:
@@ -180,9 +180,9 @@ class UserExportView(LoginRequiredMixin, View):
             users = UserProfile.objects.filter(Q(username__icontains=search) | Q(staff_no__icontains=search)
                                                | Q(department__icontains=search) | Q(seat__icontains=search)
                                                | Q(mobile__icontains=search) | Q(email__icontains=search,
-                                               is_superuser=0)).order_by('-is_staff', 'staff_no')
+                                               is_superuser=0)).order_by('-is_staff')
         else:
-            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')
+            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')
         columns_names = ['id', 'username', 'staff_no', 'department', 'seat', 'mobile', 'email', 'is_staff']
         return excel.make_response_from_query_sets(users, columns_names, 'xls', file_name='人员列表')
 
@@ -215,22 +215,21 @@ class DepartmentListView(LoginRequiredMixin,View):
         search = request.GET.get('search')
         if search:
             search = request.GET.get('search').strip()
-            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(staff_no__icontains=search)
-                                               | Q(department__icontains=search) | Q(bg_telephone__icontains=search)
-                                               | Q(mobile__icontains=search) | Q(email__icontains=search),
-                                               is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+            departments = Department.objects.filter(Q(department_name__icontains=search))
         else:
-            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff', 'staff_no')  # 排除超级管理员
+            departments = Department.objects.all()
 
         # 分页功能实现
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(users, per_page=per_page, request=request)
-        p_users = p.page(page)
+        p = Paginator(departments, per_page=per_page, request=request)
+        p_departments = p.page(page)
         start = (int(page) - 1) * per_page  # 避免分页后每行数据序号从1开始
-        return render(request, 'users/deparment_list.html', {'p_users': p_users, 'start': start, 'search': search})
+        for dep in p_departments.object_list:
+            print(dep.id,dep.department_name)
+        return render(request, 'users/department_list.html', {'p_departments': p_departments, 'start': start, 'search': search})
 
 class DepartmentAddView(LoginRequiredMixin,View):
     def get(self, request):
@@ -241,39 +240,44 @@ class DepartmentAddView(LoginRequiredMixin,View):
         if department_form.is_valid():
             department_name = request.POST.get('department_name').strip()
 
-            user = Deparment.objects.filter(department_name=department_name)
+            user = Department.objects.filter(department_name=department_name)
             if user:
                 return render(request, 'users/department_add.html', {'msg': '部门 ' + department_name + ' 已存在！'})
             else:
-                new_department = Deparment(department_name=department_name)
+                new_department = Department(department_name=department_name)
                 new_department.save()
                 return HttpResponseRedirect((reverse('users:department_list')))
         else:
             return render(request, 'users/department_add.html', {'msg': '输入错误！', 'department_form': department_form})
 
 class DepartmentModifyView(LoginRequiredMixin,View):
-    def post(self, request):
-        department_form = DepartmentInfoForm(request.POST)
-        department_id = int(request.POST.get('department_id'))
-        department = Deparment.objects.get(id=department_id)
-        if department_form.is_valid():
-            department_name = request.POST.get('username').strip()
-            other_user = UserProfile.objects.filter(~Q(id=department_id), department_name=department_name)
-            # 如果修改，判断是否冲突
-            if other_user:
-                return render(request, 'users/department_modify.html', {'department': department, 'msg': department_name + '已存在！'})
-            else:
-                department.department_name = request.POST.get('department_name').strip()
-
-                department.save()
-                return HttpResponseRedirect((reverse('users:user_list')))
-        else:
-            return render(request, 'users/department_modify.html', {'department': department, 'msg': '输入错误！',
-                                                              'department_form': department_form})
+    def get(self, request,department_id):
+        print(department_id)
+        dep = Department.objects.get(id=department_id)
+        #return render(request,'users/department_modify.html', {'department': dep})
+        return HttpResponseRedirect(reverse('users:department_modify'),department=dep)
+    # def post(self, request):
+    #     department_form = DepartmentInfoForm(request.POST)
+    #     department_id = int(request.POST.get('department_id'))
+    #     department = Department.objects.get(id=department_id)
+    #     if department_form.is_valid():
+    #         department_name = request.POST.get('username').strip()
+    #         other_user = UserProfile.objects.filter(~Q(id=department_id), department_name=department_name)
+    #         # 如果修改，判断是否冲突
+    #         if other_user:
+    #             return render(request, 'users/department_modify.html', {'department': department, 'msg': department_name + '已存在！'})
+    #         else:
+    #             department.department_name = request.POST.get('department_name').strip()
+    #
+    #             department.save()
+    #             return HttpResponseRedirect((reverse('users:user_list')))
+    #     else:
+    #         return render(request, 'users/department_modify.html', {'department': department, 'msg': '输入错误！',
+    #                                                           'department_form': department_form})
 
 class DepartmentDeleteView(LoginRequiredMixin,View):
     def get(self, request, department_id):
-        department = Deparment.objects.get(id=department_id)
+        department = Department.objects.get(id=department_id)
         department.delete()
         return HttpResponseRedirect((reverse('users:department_list')))
 

@@ -20,10 +20,10 @@ class DeviceType(models.Model):
 
 # 定义资产model
 class Device(models.Model):
-    device_type = models.ForeignKey('devices.DeviceType', on_delete=models.CASCADE)
+    device_type = models.CharField(max_length=50, verbose_name='设备型号')
     device_brand = models.CharField(max_length=50, verbose_name='设备品牌', blank=True)
     device_id = models.CharField(max_length=100, verbose_name='资产编号', blank=True)
-    device_user = models.ForeignKey('users.UserProfile', on_delete=models.SET_NULL, null=True, blank=True)
+    device_user = models.CharField(max_length=100, verbose_name='使用人', blank=True)
     buy_time = models.DateTimeField(default=datetime.now, verbose_name='采购时间')
     device_mac = models.CharField(max_length=50, verbose_name='mac地址', blank=True)
     device_root = models.CharField(max_length=10, choices=(('1', '是'), ('0', '否')),
@@ -48,7 +48,7 @@ class Device(models.Model):
 # 定义设备使用历史model
 class DeviceHis(models.Model):
     device_id = models.IntegerField(verbose_name='ID')
-    device_his = models.ForeignKey('devices.Device')
+    device_his = models.CharField(max_length=100, verbose_name='资产编号', blank=True)
     modify_time = models.DateTimeField(default=datetime.now, verbose_name='修改时间')
 
     class Meta:

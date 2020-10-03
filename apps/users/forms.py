@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import UserProfile
+from .models import UserProfile,Department
 
 
 # 定义登录时表单验证
@@ -15,15 +15,20 @@ class UserPwdModifyForm(forms.Form):
     pwd2 = forms.CharField(required=True)
 
 
+
 # 定义添加，修改用户时表单验证
 class UserInfoForm(forms.ModelForm):
     username = forms.CharField(required=True)
 
     class Meta:
         model = UserProfile
-        fields = ['department', 'seat', 'mobile','email', 'isadmin','is_staff']
+        fields = ['department', 'seat', 'mobile','email','is_staff']
 
 
 # 定义添加，修改部门时表单验证
 class DepartmentInfoForm(forms.ModelForm):
     department_name = forms.CharField(required=True)
+
+    class Meta:
+        model = Department
+        fields = ['department_name']

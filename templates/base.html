@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
-    <link rel="stylesheet" href="{% static 'servers/css/server-list.css' %}">
+    <link rel="stylesheet" href="{% static 'devices/css/device-list.css' %}">
     {% block custome_css %}{% endblock %}
 </head>
 <body>
@@ -27,11 +27,11 @@
     </div>
     <div class="sidebar" id="sidebar">
         <ul class="collapsible collapsible-accordion">
-            <li {% ifequal request.path '/' %}class="active-li"{% endifequal %}><a href="{% url 'index' %}"><i class="fa fa-tachometer" aria-hidden="true"></i><span class="">设备统计</span></a></li>
-            <li {% ifequal request.path|slice:20 '/servers/server/list' %}class="active-li"{% endifequal %}><a href="{% url 'servers:server_list' %}"><i class="fa fa-table" aria-hidden="true"></i><span>设备列表</span></a></li>
+{#            <li {% ifequal request.path '/' %}class="active-li"{% endifequal %}><a href="{% url 'index' %}"><i class="fa fa-tachometer" aria-hidden="true"></i><span class="">设备统计</span></a></li> #}
+            <li {% ifequal request.path|slice:20 '/devices/device/list' %}class="active-li"{% endifequal %}><a href="{% url 'devices:device_list' %}"><i class="fa fa-table" aria-hidden="true"></i><span>设备列表</span></a></li>
             {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
-                <li {% ifequal request.path|slice:18 '/servers/type/list' %}class="active-li"{% endifequal %}><a href="{% url 'servers:type_list' %}"><i class="fa fa-bars" aria-hidden="true"></i><span>设备管理</span></a></li>
-                <li {% ifequal request.path|slice:21 '/users/deparment/list' %}class="active-li"{% endifequal %}><a href="{% url 'users:department_list' %}"><i class="fa fa-user" aria-hidden="true"></i><span class="">部门管理</span></a></li>
+                <li {% ifequal request.path|slice:18 '/devices/type/list' %}class="active-li"{% endifequal %}><a href="{% url 'devices:type_list' %}"><i class="fa fa-bars" aria-hidden="true"></i><span>设备管理</span></a></li>
+                <li {% ifequal request.path|slice:21 '/users/department/list' %}class="active-li"{% endifequal %}><a href="{% url 'users:department_list' %}"><i class="fa fa-user" aria-hidden="true"></i><span class="">部门管理</span></a></li>
                 <li {% ifequal request.path|slice:16 '/users/user/list' %}class="active-li"{% endifequal %}><a href="{% url 'users:user_list' %}"><i class="fa fa-user" aria-hidden="true"></i><span class="">用户管理</span></a></li>
                 <li {% ifequal request.path|slice:23 '/users/user/operate_log' %}class="active-li"{% endifequal %}><a href="{% url 'users:operate_log' %}"><i class="fa fa-book" aria-hidden="true"></i><span class="">日志记录</span></a></li>
             {% endif %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from devices.views import IndexView,ServerListView
+from devices.views import IndexView,DeviceListView
 
 
 urlpatterns = [

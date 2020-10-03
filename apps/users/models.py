@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-class Deparment(models.Model):
+class Department(models.Model):
     department_name = models.CharField(max_length=20, verbose_name='部门名称')
 
     class Meta:

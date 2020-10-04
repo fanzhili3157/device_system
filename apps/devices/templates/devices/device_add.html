@@ -10,38 +10,47 @@
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'devices:device_add' %}" method="post">
             <div class="form-list">
-                <span>*设备类型</span>
-                <select {% if device_form.errors.device_type %}class="input-error"{% endif %} name="device_type">
+                <span>*设备类型</span><select {% if device_form.errors.device_type %}class="input-error"{% endif %} name="device_type",placeholder=" ">
                     <option style="display: none;" disabled selected>请选择</option>
-                    {% for device_type in device_types %}
-                        <option value="{{ device_type.id }}">{{ device_type.device_type }}</option>
+                    {% for device_type in devices_types %}
+                        <option value="{{ device_type.device_type  }}">{{ device_type.device_type }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-list">
-                <span>资产编号</span><input {% if device_form.errors.device_id %}class="input-error"{% endif %} type="text" name="device_id" placeholder="不超过100个字符"/>
+                <span>*资产编号</span><input {% if device_form.errors.device_id %}class="input-error"{% endif %} type="text" name="device_id" />
             </div>
             <div class="form-list">
-                <span>mac地址</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_mac" placeholder="不超过50个字符"/>
+                <span>*采购日期</span><input {% if device_form.errors.buy_time %}class="input-error"{% endif %} type="date" name="buy_time" />
             </div>
             <div class="form-list">
-                <span>是否root</span><input {% if device_form.errors.device_root %}class="input-error"{% endif %} type="text" name="device_root" placeholder="不超过50个字符"/>
+                <span>mac地址</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_mac" />
             </div>
+
             <div class="form-list">
-                <span>设备状态</span><input {% if device_form.errors.device_status %}class="input-error"{% endif %} type="text" name="device_status" placeholder="不超过50个字符"/>
-            </div>
-             <div class="form-list">
-                <span>*使用人</span>
-                <select {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user">
+                <span>*是否root</span><select {% if device_form.errors.device_root %}class="input-error"{% endif %} name="device_root" >
                     <option style="display: none;" disabled selected>请选择</option>
-                    <option value="0">无</option>
-                    {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.username }}</option>
-                    {% endfor %}
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+            </select>
+            </div>
+            <div class="form-list">
+                <span>*设备状态</span><select {% if device_form.errors.device_status %}class="input-error"{% endif %}  name="device_status" onchange="myFunction(this.value)">
+                    <option style="display: none;" disabled selected>请选择</option>
+                    <option value="0">空闲</option>
+                    <option value="1">使用中</option>
+                    <option value="-1">损坏</option>
                 </select>
             </div>
+
+             <div class="form-list" id="vis1">
+                <span>使用人</span><input {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user"/>
+            </div>
+            <div class="form-list" id="vis2">
+                <span>预期结束使用</span><input {% if device_form.errors.expired_date %}class="input-error"{% endif %} type="date" name="expired_date" />
+            </div>
             <div class="form-list">
-                <span class="comment">备注</span><textarea class="textarea {% if device_form.errors.comment %}input-error{% endif %}" name="comment" placeholder="不超过300个字符"></textarea>
+                <span class="comment">备注</span><textarea class="textarea {% if device_form.errors.comment %}input-error{% endif %}" name="comment" ></textarea>
             </div>
             {% if msg %}
                 <div class="error">{{ msg }}</div>
@@ -59,6 +68,18 @@
 {% endblock %}
 {% block custome_js %}
     <script>
+        function myFunction(val) {
+        var x = val;
+        var d1 = document.getElementById("vis1");
+        var d2 = document.getElementById("vis2");
+        if (x === '0'||x==='-1') {
+            d1.style.visibility = "hidden"
+            d2.style.visibility = "hidden"
+        }else{
+            d1.style.visibility = "visible"
+            d2.style.visibility = "visible"
+        }
+    }
         function btn_cancel() {
             location.href = "{% url 'devices:device_list' %}";
         }

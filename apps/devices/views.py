@@ -7,7 +7,7 @@ from pure_pagination import Paginator, PageNotAnInteger
 import csv
 
 from .models import Device, DeviceType, DeviceHis
-from .forms import DeviceForm, DeviceTypeForm
+from .forms import DeviceForm, DeviceTypeForm,DeviceHisForm
 from users.models import UserOperateLog, UserProfile
 from device_sys.settings import per_page
 from utils.mixin_utils import LoginRequiredMixin
@@ -48,7 +48,6 @@ class IndexView(View):
         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
         return render(request, 'devices/device_list.html', {'p_devices': p_devices, 'start': start, 'search': search})
 
-
 # 设备列表
 class DeviceListView(View):
     def get(self, request):
@@ -74,6 +73,11 @@ class DeviceListView(View):
         else:
             devices = Device.objects.all().order_by('device_type', 'id')
 
+            uses = DeviceHis.objects.filter(is_ongoing='1')
+
+            for u in uses:
+                print(u.device_id)
+
         # 分页功能实现
         try:
             page = request.GET.get('page', 1)
@@ -81,11 +85,12 @@ class DeviceListView(View):
             page = 1
         p = Paginator(devices, per_page=per_page, request=request)
         p_devices = p.page(page)
+        print(p_devices)
         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
-        return render(request, 'devices/device_list.html', {'p_devices': p_devices, 'start': start, 'search': search})
+        return render(request, 'devices/device_list.html', {'p_devices': p_devices, 'uses':uses,'start': start, 'search': search})
 
 
-# 资产设备
+# 设备添加
 class DeviceAddView(LoginRequiredMixin, View):
     def get(self, request):
         users = UserProfile.objects.filter(is_superuser=0, is_staff='1')
@@ -93,49 +98,79 @@ class DeviceAddView(LoginRequiredMixin, View):
         return render(request, 'devices/device_add.html', {'users': users, 'devices_types': device_types})
 
     def post(self, request):
-        device_type = DeviceType.objects.filter(id=request.POST.get('device_type', 0)).first()
-        device_user = UserProfile.objects.filter(id=request.POST.get('device_user', 0)).first()
-        device_id = request.POST.get('device_id').strip()
-        device_mac = request.POST.get('device_mac').strip()
-
-        device_root = request.POST.get('device_root')
-        device_status = request.POST.get('device_status').strip()
-        comment = request.POST.get('comment').strip()
-
         device_form = DeviceForm(request.POST)
         # 判断表单是否正确
-        if device_form.is_valid():
-            new_device = Device(device_type=device_type, device_id=device_id, device_mac=device_mac, device_root=device_root,
-                                device_status=device_status, device_user=device_user,comment=comment)
-            new_device.save()
+        if device_form.is_valid():  #更新设备表
+            device_type = request.POST.get('device_type').strip()
+            device_id = request.POST.get('device_id').strip()
+            buy_time = request.POST.get('buy_time').strip()
+            device_mac = request.POST.get('device_mac').strip()
+            device_root = request.POST.get('device_root')
+            device_status = request.POST.get('device_status').strip()
+            device_user = request.POST.get('device_user').strip()
+            expired_date = request.POST.get('expired_date').strip()
+            comment = request.POST.get('comment').strip()
 
-            user_name = device_user.username if device_user else ''
+            dev_id = Device.objects.filter(device_id=device_id)
+            if dev_id:
+                return render(request,'devices/device_add.html',{'msg':'资产编号重复'})
 
-            # 该记录添加到历史表中
-            device_his = DeviceHis(deviceid=new_device.id, device_type=device_type.device_type, device_id=device_id,
-                                   device_mac=device_mac, device_root=device_root, device_status=device_status, device_user=device_user,
-                                   comment=comment)
-            device_his.save()
+            if device_status=='1': #如果是使用中，检查使用人信息和时间
+                if device_form.data['device_user'] !='' and device_form.data['expired_date'] !='':
 
-            # 将操作记录添加到日志中
-            new_log = UserOperateLog(username=request.user.username, scope=device_type.device_type, type='增加',
-                                     content=device_his.deviceid)
-            new_log.save()
+                    device_user = request.POST.get('device_user').strip()
+                    expired_date = request.POST.get('expired_date').strip()
+                    if UserProfile.objects.filter(username=device_user):
+                        new_use = DeviceHis(device_id=device_id,device_user=device_user,expired_date=expired_date)
+                        new_use.save()
+                        new_device = Device(device_type=device_type, device_id=device_id, buy_time=buy_time,
+                                            device_mac=device_mac, device_root=device_root,
+                                            device_status=device_status, device_user=device_user,
+                                            expired_date=expired_date, comment=comment)
+                        new_device.save()
+                    else:
+                        return render(request, 'devices/device_add.html', {'msg': '用户不存在'})
+                else:
+                    device_types = DeviceType.objects.all()
+                    return render(request, 'devices/device_add.html', {'msg': '输入使用人和日期','device_form':device_form,'device_types':device_types})
+            else: #如果是空闲，则忽略使用人和时间
+                new_device = Device(device_type=device_type, device_id=device_id, buy_time=buy_time,
+                                    device_mac=device_mac, device_root=device_root,
+                                    device_status=device_status,
+                                    comment=comment)
+                new_device.save()
+
+
             return HttpResponseRedirect((reverse('devices:device_list')))
+
+            # device_user = UserProfile.objects.filter(username=request.POST.get('device_user', 0)).first()
+
+            #
+            # user_name = device_user.username if device_user else ''
+            #
+            # # 该记录添加到历史表中
+            # device_his = DeviceHis(deviceid=new_device.id, device_type=device_type.device_type, device_id=device_id,
+            #                        device_mac=device_mac, device_root=device_root, device_status=device_status, device_user=device_user,
+            #                        comment=comment)
+            # device_his.save()
+            #
+            # # 将操作记录添加到日志中
+            # new_log = UserOperateLog(username=request.user.username, scope=device_type.device_type, type='增加',
+            #                          content=device_his.deviceid)
+            # new_log.save()
+            # return HttpResponseRedirect((reverse('devices:device_list')))
         else:
-            users = UserProfile.objects.filter(is_superuser=0)
             device_types = DeviceType.objects.all()
-            return render(request, 'devices/device_add.html', {'msg': '输入错误！', 'users': users,
-                                                               'device_form': device_form, 'device_types': device_types})
+            return render(request, 'devices/device_add.html', {'msg': '输入错误！', 'device_form': device_form, 'device_types': device_types})
 
 
 # 设备详情
 class DeviceDetailView(LoginRequiredMixin, View):
     def get(self, request, device_id):
-        device = Device.objects.filter(id=device_id).first()
+        device = Device.objects.filter(device_id=device_id).first()
         users = UserProfile.objects.filter(is_superuser=0, is_staff='1')
         device_types = DeviceType.objects.all()
-        device_his = DeviceHis.objects.filter(device_id=device_id).order_by('-modify_time')
+        device_his = DeviceHis.objects.filter(device_id=device_id)
 
         # 分页功能实现
         try:
@@ -150,7 +185,7 @@ class DeviceDetailView(LoginRequiredMixin, View):
                                                               'p_device_his': p_device_his, 'start': start})
 
 
-# 资产设备
+# 设备修改
 class DeviceModifyView(LoginRequiredMixin, View):
     def post(self, request):
         device_id = int(request.POST.get('device_id'))
@@ -158,15 +193,20 @@ class DeviceModifyView(LoginRequiredMixin, View):
         device_form = DeviceForm(request.POST)
         # 判断表单是否正确
         if device_form.is_valid():
-            device.device_type = DeviceType.objects.filter(id=request.POST.get('device_type')).first()
-            device.device_id = request.POST.get('device_id').strip()
-            device.device_status = request.POST.get('device_status').strip()
-            device.brand = request.POST.get('brand').strip()
-            device.buy_time = request.POST.get('buy_time').strip()
+
+            #空闲->使用
+            #使用 ->空闲
+            #使用 -> 使用
+
+            #device.device_type = DeviceType.objects.filter(id=request.POST.get('device_type')).first()
+            #device.device_id = request.POST.get('device_id').strip()
             device.device_mac = request.POST.get('device_mac').strip()
             device.device_root = request.POST.get('device_root').strip()
-            device.device_user = UserProfile.objects.filter(id=request.POST.get('device_user', 0)).first()
+            device.device_status = request.POST.get('device_status').strip()
+            device.device_user = request.POST.get('device_user')
+            device.expired_date = request.POST.get('expired_date').strip()
             device.comment = request.POST.get('comment').strip()
+
             device.save()
 
             user_name = device.device_user.username if device.device_user else ''
@@ -251,11 +291,28 @@ class DeviceDeleteView(LoginRequiredMixin, View):
 
 # 设备类型列表
 class TypeListView(LoginRequiredMixin, View):
+    # def get(self, request):
+    #     device_types = DeviceType.objects.all()
+    #     print(device_types)
+    #     return render(request, 'devices/type_list.html', {'device_types': device_types})
     def get(self, request):
-        device_types = DeviceType.objects.all()
-        print(device_types)
-        return render(request, 'devices/type_list.html', {'device_types': device_types})
+        search = request.GET.get('search')
+        if search:
+            search = request.GET.get('search').strip()
+            device_types = DeviceType.objects.filter(Q(device_type__icontains=search))
+        else:
+            device_types = DeviceType.objects.all()
 
+        # 分页功能实现
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(device_types, per_page=per_page, request=request)
+        p_device_types = p.page(page)
+        start = (int(page) - 1) * per_page  # 避免分页后每行数据序号从1开始
+
+        return render(request, 'devices/type_list.html', {'p_device_types': p_device_types, 'start': start, 'search': search})
 
 # 设备类型添加
 class TypeAddView(LoginRequiredMixin, View):

@@ -7,9 +7,9 @@ urlpatterns = [
     # 设备url
     path('device/list/', DeviceListView.as_view(), name='device_list'),
     path('device/add/', DeviceAddView.as_view(), name='device_add'),
-    path('device/detail/<int:device_id>/', DeviceDetailView.as_view(), name='device_detail'),
+    path('device/detail/<device_id>/', DeviceDetailView.as_view(), name='device_detail'),
     path('device/modify/', DeviceModifyView.as_view(), name='device_modify'),
-    path('device/delete/<int:device_id>/', DeviceDeleteView.as_view(), name='device_delete'),
+    path('device/delete/<device_id>/', DeviceDeleteView.as_view(), name='device_delete'),
     #path('device/export/', ServerExportView.as_view(), name='server_export'),
 
     # 资产类型url

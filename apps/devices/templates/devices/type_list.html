@@ -17,7 +17,7 @@
         </div>
         <button class="button-insert" id="btn_add">添加类型</button>
         <br/><br/>
-        <p>共计{{ device_types.object_list|length }}条记录</p>
+        <p>共计{{ p_device_types.object_list|length }}条记录</p>
         <table class="table-list">
             <thead>
                 <tr>
@@ -29,10 +29,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for device in device_types.object_list %}
+                {% for device in p_device_types.object_list %}
                     <tr>
                        <td>{{ forloop.counter|add:start }}</td>
-                        <td><{{ device.device_type }}</td>
+                        <td>{{ device.device_type }}</td>
                         <td>{{ device.device_system }}</td>
                         <td>{{ device.device_cpu }}</td>
                         <td>{{ device.device_res }}</td>

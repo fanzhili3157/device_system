@@ -117,7 +117,7 @@ PAGINATION_SETTINGS = {
 }
 
 # 定义全局的变量
-per_page = 15  # 定义html页面中列表每页显示的数量
+per_page = 30 # 定义html页面中列表每页显示的数量
 
 # 全局404配置，名称必须是handler404
 handler404 = 'users.views.page_not_found'

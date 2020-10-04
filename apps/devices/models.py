@@ -10,7 +10,6 @@ class DeviceType(models.Model):
     device_cpu = models.CharField(max_length=20, verbose_name='cpu')
     device_men = models.CharField(max_length=20, verbose_name='内存')
     device_res = models.CharField(max_length=20, verbose_name='分辨率')
-
     class Meta:
         verbose_name = '设备品牌和型号'
         verbose_name_plural = verbose_name
@@ -18,19 +17,19 @@ class DeviceType(models.Model):
     def __str__(self):
         return self.device_type
 
-# 定义资产model
+# 定义设备model
 class Device(models.Model):
     device_type = models.CharField(max_length=50, verbose_name='设备型号')
-    device_brand = models.CharField(max_length=50, verbose_name='设备品牌', blank=True)
-    device_id = models.CharField(max_length=100, verbose_name='资产编号', blank=True)
-    device_user = models.CharField(max_length=100, verbose_name='使用人', blank=True)
-    buy_time = models.DateTimeField(default=datetime.now, verbose_name='采购时间')
-    device_mac = models.CharField(max_length=50, verbose_name='mac地址', blank=True)
+    device_id = models.CharField(max_length=50, verbose_name='资产编号')
+    buy_time = models.DateField(verbose_name='采购时间')
+    device_mac = models.CharField(max_length=50, verbose_name='mac地址', null=True,blank=True)
     device_root = models.CharField(max_length=10, choices=(('1', '是'), ('0', '否')),
-                               verbose_name='是否root', default='0', blank=True)
+                               verbose_name='是否root', default='0')
     device_status = models.CharField(max_length=10, choices=(('1', '占用'), ('0', '空闲'), ('-1', '损坏')),
-                                   verbose_name='设备状态', default='0', blank=True)
-    description = models.CharField(max_length=50, verbose_name='描述信息', blank=True)
+                                   verbose_name='设备状态', default='0')
+    device_user = models.CharField(max_length=50, verbose_name='使用人',null=True,blank=True)
+    expired_date = models.DateField(verbose_name='预计结束时间',null=True,blank=True)
+    description = models.CharField(max_length=100, verbose_name='描述信息', blank=True)
     comment = models.CharField(max_length=300, verbose_name='备注', blank=True)
 
 
@@ -47,12 +46,33 @@ class Device(models.Model):
 
 # 定义设备使用历史model
 class DeviceHis(models.Model):
-    device_id = models.IntegerField(verbose_name='ID')
-    device_his = models.CharField(max_length=100, verbose_name='资产编号', blank=True)
-    modify_time = models.DateTimeField(default=datetime.now, verbose_name='修改时间')
+    device_id = models.CharField(max_length=50, verbose_name='资产编号')
+    device_user = models.CharField(max_length=50, verbose_name='使用人')
+    device_next_user = models.CharField(max_length=50, verbose_name='下个使用人', blank=True)
+    start_time = models.DateTimeField(default=datetime.now, verbose_name='开始时间')
+    end_time = models.DateTimeField( verbose_name='结束时间',null=True,blank=True)
+    expired_date = models.DateField(verbose_name='预计结束时间')
+    is_ongoing = models.CharField(max_length=10, choices=(('1', '进行中'), ('0', '结束使用')),
+                                     verbose_name='设备状态', default='1')
 
     class Meta:
-        verbose_name = '资产历史表'
+        verbose_name = '设备使用历史表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.device_id
+
+
+
+# 定义设备申请model
+class DeviceRequest(models.Model):
+    device_id = models.CharField(max_length=50, verbose_name='资产编号')
+    device_user = models.CharField(max_length=50, verbose_name='申请人')
+    device_ower = models.CharField(max_length=50, verbose_name='被申请人')
+    expired_date = models.DateField(verbose_name='预计结束时间')
+
+    class Meta:
+        verbose_name = '设备使用历史表'
         verbose_name_plural = verbose_name
 
     def __str__(self):

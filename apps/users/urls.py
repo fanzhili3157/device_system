@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import UserLoginView, UserLogoutView
 from .views import UserListView, UserAddView, UserDetailView, UserModifyView, UserResetPwd, UserDeleteView
-from .views import UserPwdModifyView, UserExportView, UserOperateView
+from .views import UserPwdModifyView, UserExportView
 from .views import DepartmentListView,DepartmentAddView,DepartmentModifyView,DepartmentDeleteView,DepartmentDetailView
 
 urlpatterns = [
@@ -28,5 +28,5 @@ urlpatterns = [
 
 
     # 定义操作日志url
-    path('user/operate_log/', UserOperateView.as_view(), name='operate_log'),
+    #path('user/operate_log/', UserOperateView.as_view(), name='operate_log'),
 ]

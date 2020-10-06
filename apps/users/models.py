@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class Department(models.Model):
-    department_name = models.CharField(max_length=20, verbose_name='部门名称')
+    department_name = models.CharField(max_length=20, verbose_name='部门名称',unique=True)
 
     class Meta:
         verbose_name = '部门信息'
@@ -16,8 +16,7 @@ class Department(models.Model):
 
 # 定义用户模型，添加额外的字段
 class UserProfile(AbstractUser):
-    #department = models.ForeignKey('users.Deparment',on_delete=models.CASCADE,blank=True)
-    department = models.CharField(max_length=30, verbose_name='部门信息', blank=True)
+    department = models.ForeignKey(Department,on_delete=models.DO_NOTHING,null=True)
     seat = models.CharField(max_length=30, verbose_name='工位信息', blank=True)
     mobile = models.CharField(max_length=30, verbose_name='手机号码', blank=True)
     email = models.CharField(max_length=30, verbose_name='邮箱', blank=True)
@@ -36,19 +35,19 @@ class UserProfile(AbstractUser):
 
 
 # 定义用户操作日志模型
-class UserOperateLog(models.Model):
-    username = models.CharField(max_length=20, verbose_name='人员')
-    scope = models.CharField(max_length=20, verbose_name='操作范围')
-    type = models.CharField(max_length=20, verbose_name='操作类型')
-    content = models.IntegerField(verbose_name='操作内容')
-    modify_time = models.DateTimeField(default=datetime.now, verbose_name='操作时间')
-
-    class Meta:
-        verbose_name = '用户操作日志'
-        verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.username + '.' + self.type
+# class UserOperateLog(models.Model):
+#     username = models.CharField(max_length=30, verbose_name='人员')
+#     scope = models.CharField(max_length=30, verbose_name='操作范围')
+#     type = models.CharField(max_length=30, verbose_name='操作类型')
+#     content = models.IntegerField(verbose_name='操作内容')
+#     modify_time = models.DateTimeField(default=datetime.now, verbose_name='操作时间')
+#
+#     class Meta:
+#         verbose_name = '操作日志'
+#         verbose_name_plural = verbose_name
+#
+#     def __str__(self):
+#         return self.username + '.' + self.type
 
 
 

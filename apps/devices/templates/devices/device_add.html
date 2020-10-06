@@ -10,10 +10,10 @@
         <div style="clear:both"></div>
         <form class="form-table" action="{% url 'devices:device_add' %}" method="post">
             <div class="form-list">
-                <span>*设备类型</span><select {% if device_form.errors.device_type %}class="input-error"{% endif %} name="device_type",placeholder=" ">
+                <span>*设备类型</span><select {% if device_form.errors.device_type %}class="input-error"{% endif %} name="device_type">
                     <option style="display: none;" disabled selected>请选择</option>
                     {% for device_type in devices_types %}
-                        <option value="{{ device_type.device_type  }}">{{ device_type.device_type }}</option>
+                        <option value="{{ device_type.id  }}">{{ device_type.device_type }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -25,6 +25,12 @@
             </div>
             <div class="form-list">
                 <span>mac地址</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_mac" />
+            </div>
+            <div class="form-list">
+                <span>操作系统版本</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_sys" />
+            </div>
+            <div class="form-list">
+                <span>内存信息</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_men" />
             </div>
 
             <div class="form-list">
@@ -44,7 +50,12 @@
             </div>
 
              <div class="form-list" id="vis1">
-                <span>使用人</span><input {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user"/>
+                <span>使用人</span><select {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user"/>
+                 <option style="display: none;" disabled selected>请选择</option>
+                    {% for user in users %}
+                        <option value="{{ user.id  }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-list" id="vis2">
                 <span>预期结束使用</span><input {% if device_form.errors.expired_date %}class="input-error"{% endif %} type="date" name="expired_date" />

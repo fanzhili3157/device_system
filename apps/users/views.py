@@ -8,7 +8,8 @@ from django.db.models import Q
 import django_excel as excel
 from pure_pagination import Paginator, PageNotAnInteger
 
-from .models import UserProfile, UserOperateLog,Department
+
+from .models import UserProfile,Department
 from .forms import LoginForm, UserPwdModifyForm, UserInfoForm, DepartmentInfoForm
 from device_sys.settings import per_page
 from utils.mixin_utils import LoginRequiredMixin
@@ -76,7 +77,7 @@ class UserListView(LoginRequiredMixin, View):
         search = request.GET.get('search')
         if search:
             search = request.GET.get('search').strip()
-            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__icontains=search),
+            users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__department_name__icontains=search),
                                                is_superuser=0).order_by('-is_staff')
         else:
             users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')
@@ -103,7 +104,7 @@ class UserAddView(LoginRequiredMixin, View):
         #print(userinfo_form)
         if userinfo_form.is_valid():
             username = request.POST.get('username').strip()
-            department = request.POST.get('department').strip()
+            department = Department.objects.filter(id=request.POST.get('department',0)).first()
             seat = request.POST.get('seat').strip()
             mobile = request.POST.get('mobile').strip()
             email = request.POST.get('email').strip()
@@ -146,7 +147,7 @@ class UserModifyView(LoginRequiredMixin, View):
                 return render(request, 'users/user_detail.html', {'user': user, 'msg': username+'用户名已存在！'})
             else:
                 user.username = request.POST.get('username').strip()
-                user.department = request.POST.get('department').strip()
+                user.department = Department.objects.filter(id=request.POST.get('department',0)).first()
                 user.seat = request.POST.get('seat').strip()
                 user.mobile = request.POST.get('mobile').strip()
                 user.email = request.POST.get('email').strip()
@@ -193,27 +194,27 @@ class UserExportView(LoginRequiredMixin, View):
 
 
 # 操作日志视图(所有用户可见)
-class UserOperateView(LoginRequiredMixin, View):
-    def get(self, request):
-        search = request.GET.get('search')
-        if search:
-            search = search.strip().upper()
-            operate_logs = UserOperateLog.objects.filter(Q(username__icontains=search) | Q(scope__icontains=search)
-                                                         | Q(type__icontains=search)).order_by('-modify_time')
-        else:
-            operate_logs = UserOperateLog.objects.all().order_by('-modify_time')
-
-        # 分页功能实现
-        try:
-            page = request.GET.get('page', 1)
-        except PageNotAnInteger:
-            page = 1
-        p = Paginator(operate_logs, per_page=per_page, request=request)
-        p_operate_logs = p.page(page)
-        start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
-
-        return render(request, 'users/operate_log.html', {'operate_logs': p_operate_logs, 'start': start,
-                                                          'search': search})
+# class UserOperateView(LoginRequiredMixin, View):
+#     def get(self, request):
+#         search = request.GET.get('search')
+#         if search:
+#             search = search.strip().upper()
+#             operate_logs = UserOperateLog.objects.filter(Q(username__icontains=search) | Q(scope__icontains=search)
+#                                                          | Q(type__icontains=search)).order_by('-modify_time')
+#         else:
+#             operate_logs = UserOperateLog.objects.all().order_by('-modify_time')
+#
+#         # 分页功能实现
+#         try:
+#             page = request.GET.get('page', 1)
+#         except PageNotAnInteger:
+#             page = 1
+#         p = Paginator(operate_logs, per_page=per_page, request=request)
+#         p_operate_logs = p.page(page)
+#         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
+#
+#         return render(request, 'users/operate_log.html', {'operate_logs': p_operate_logs, 'start': start,
+#                                                           'search': search})
 
 class DepartmentListView(LoginRequiredMixin,View):
     def get(self, request):
@@ -303,3 +304,4 @@ def page_error(request):
     response = render('500.html')
     response.status_code = 500
     return response
+

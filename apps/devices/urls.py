@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import DeviceListView, DeviceAddView, DeviceDetailView, DeviceModifyView, DeviceDeleteView
+from .views import DeviceListView, DeviceAddView, DeviceDetailView, DeviceModifyView, DeviceDeleteView,DeviceImportView
 from .views import TypeListView, TypeAddView, TypeDetailView, TypeModifyView
 
 urlpatterns = [
@@ -10,7 +10,8 @@ urlpatterns = [
     path('device/detail/<device_id>/', DeviceDetailView.as_view(), name='device_detail'),
     path('device/modify/', DeviceModifyView.as_view(), name='device_modify'),
     path('device/delete/<device_id>/', DeviceDeleteView.as_view(), name='device_delete'),
-    #path('device/export/', ServerExportView.as_view(), name='server_export'),
+    path('device/import/', DeviceImportView.as_view(), name='device_import'),
+    #path('device/export/', DeviceExportView.as_view(), name='device_export'),
 
     # 资产类型url
     path('type/list/', TypeListView.as_view(), name='type_list'),

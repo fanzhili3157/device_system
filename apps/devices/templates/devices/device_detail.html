@@ -12,16 +12,24 @@
             <form class="form-table" action="{% url 'devices:device_modify' %}" method="post">
                 <input type="hidden" id="device_id" name="device_id" value="{{ device.id }}"/>
                 <div class="form-list">
-                    <span>资产类型</span>
-                    <text>{{ device.device_type }}
-                    </text>
+                    <span>资产类型</span><select {% if device_form.errors.device_type %}class="input-error"{% endif %}  name="device_type"/>
+                    <option value={{ device.device_type_id }} >{{ device.device_type }}</option>
+                    </select>
                 </div>
                 <div class="form-list">
-                    <span>资产编号</span>
-                    <text>{{ device.device_id }}
+                    <span>资产编号</span><input {% if device_form.errors.device_id %}class="input-error"{% endif %} type="text" name="device_id" value="{{ device.device_id}}" disabled="disabled"/>
                 </div>
                 <div class="form-list">
-                    <span>mac地址</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_mac" value="{{ device.device_mac }}"/>
+                    <span>采购日期</span><input {% if device_form.errors.buy_time %}class="input-error"{% endif %} type="date" name="buy_time" value="{{ device.buy_time|date:'Y-m-d'}}" disabled="disabled"/>
+                </div>
+                <div class="form-list">
+                    <span>mac地址</span><input {% if device_form.errors.device_mac %}class="input-error"{% endif %} type="text" name="device_mac" value="{{ device.device_mac | default_if_none:"" }}"/>
+                </div>
+                <div class="form-list">
+                    <span>操作系统版本</span><input {% if device_form.errors.device_sys %}class="input-error"{% endif %} type="text" name="device_sys" value="{{ device.device_sys | default_if_none:"" }}"/>
+                </div>
+                <div class="form-list">
+                    <span>内存信息</span><input {% if device_form.errors.device_men %}class="input-error"{% endif %} type="text" name="device_men" value="{{ device.device_men | default_if_none:"" }}"/>
                 </div>
                 <div class="form-list">
                 <span>*是否root</span><select {% if device_form.errors.device_root %}class="input-error"{% endif %} name="device_root" >
@@ -31,17 +39,22 @@
             </select>
             </div>
                 <div class="form-list">
-                <span>*设备状态</span><select {% if device_form.errors.device_status %}class="input-error"{% endif %}  name="device_status" >
+                <span>*设备状态</span><select {% if device_form.errors.device_status %}class="input-error"{% endif %}  name="device_status" onchange="myFunction(this.value)">
                     <option style="display: none" disabled selected>请选择</option>
                     <option value="0" {% ifequal device.device_status '0' %} selected {% endifequal %}>空闲</option>
                     <option value="1" {% ifequal device.device_status '1' %} selected {% endifequal %}>占用</option>
                     <option value="-1" {% ifequal device.device_status '-1' %} selected {% endifequal %}>损坏</option>
                 </select>
             </div>
-          <div class="form-list"  {% ifequal device.device_status '1'%}style="visibility: visible" {% else %}style="visibility: hidden"{% endifequal %}>
-                <span>使用人</span><input {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user" value="{{ device.device_user| default_if_none:"" }}"/>
-            </div>
-            <div class="form-list" {% ifequal device.device_status '1'%}style="visibility: visible" {% else %}style="visibility: hidden"{% endifequal %}>
+          <div class="form-list" id="vis1" {% ifequal device.device_status '1'%}style="visibility: visible" {% else %}style="visibility: hidden"{% endifequal %}>
+                <span>使用人</span><select {% if device_form.errors.device_user %}class="input-error"{% endif %} name="device_user"/>
+                           <option style="display: none;" disabled selected>请选择</option>
+                    {% for user in users %}
+                        <option value="{{ user.id  }}" {% ifequal device.device_user_id user.id %} selected {% endifequal %}>{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+          </div>
+            <div class="form-list" id="vis2" {% ifequal device.device_status '1'%}style="visibility: visible" {% else %}style="visibility: hidden"{% endifequal %}>
                 <span>预期结束使用</span><input {% if device_form.errors.expired_date %}class="input-error"{% endif %} type="date" name="expired_date" value="{{ device.expired_date }}"/>
             </div>
             <div class="form-list">
@@ -65,76 +78,70 @@
         </div>
 
 
-{#	#}
-{#    <div class="content">#}
-{#        <a name="hist"></a>#}
-{#        <p>设备历史记录</p>#}
-{#        <table class="table-list">#}
-{#            <thead>#}
-{#                <tr>#}
-{#                    <th>序号</th>#}
-{#                    <th>资产类型</th>#}
-{#                    <th>IP地址</th>#}
-{#                    <th>功能描述</th>#}
-{#                    <th>设备品牌</th>#}
-{#                    <th>设备型号</th>#}
-{#                    <th>设备序号</th>#}
-{#                    <th>设备配置</th>#}
-{#                    <th>管理人员</th>#}
-{#                    <th>所在网络</th>#}
-{#                    <th>保修期</th>#}
-{#                    <th>备注</th>#}
-{#                    <th>修改时间</th>#}
-{#                </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#                {% for device in p_device_hiss.object_list %}#}
-{#                    <tr>#}
-{#                        <td>{{ forloop.counter|add:start }}</td>#}
-{#                        <td>{{ device.device_type }}</td>#}
-{#                        <td>{{ device.ipaddress }}</td>#}
-{#                        <td>{{ device.description }}</td>#}
-{#                        <td>{{ device.brand }}</td>#}
-{#                        <td>{{ device.zcmodel }}</td>#}
-{#                        <td>{{ device.zcnumber }}</td>#}
-{#                        <td>{{ device.zcpz }}</td>#}
-{#                        <td>{{ device.owner.username }}</td>#}
-{#                        <td>{{ device.undernet }}</td>#}
-{#                        <td>{{ device.guartime }}</td>#}
-{#                        <td><div class="more-text">{{ device.comment }}</div></td>#}
+
+    <div class="content">
+        <a name="hist"></a>
+        <p>设备历史记录</p>
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>使用人</th>
+                    <th>开始时间</th>
+                    <th>结束时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dev_his in p_device_his.object_list %}
+                    <tr>
+                        <td>{{ forloop.counter|add:start }}</td>
+                        <td>{{ dev_his.device_user }}</td>
+                        <td>{{ dev_his.start_time |date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ dev_his.end_time |date:"Y-m-d H:i:s" }}</td>
 {#                        <td>{{ device.modify_time|date:"Y-m-d H:i:s" }}</td>#}
-{#                    </tr>#}
-{#                {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#        <div class="page">#}
-{#            <ul class="pagination">#}
-{#                {% if p_device_hiss.has_previous %}#}
-{#                    <li><a href="?{{ p_device_hiss.previous_page_number.querystring }}#hist">&laquo;</a></li>#}
-{#                {% endif %}#}
-{#                {% for page in p_device_hiss.pages %}#}
-{#                    {% if page %}#}
-{#                        {% ifequal page p_device_hiss.number %}#}
-{#                            <li class="active"><a href="?{{ page.querystring }}#hist">{{ page }}</a></li>#}
-{#                        {% else %}#}
-{#                            <li><a href="?{{ page.querystring }}#hist">{{ page }}</a></li>#}
-{#                        {% endifequal %}#}
-{#                    {% else %}#}
-{#                        <li>...</li>#}
-{#                    {% endif %}#}
-{#                {% endfor %}#}
-{#                {% if p_device_hiss.has_next %}#}
-{#                    <li><a href="?{{ p_device_hiss.next_page_number.querystring }}#hist">&raquo;</a></li>#}
-{#                {% endif %}#}
-{#            </ul>#}
-{#        </div>#}
-{#    </div>#}
-{#	#}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="page">
+            <ul class="pagination">
+                {% if p_device_hiss.has_previous %}
+                    <li><a href="?{{ p_device_hiss.previous_page_number.querystring }}#hist">&laquo;</a></li>
+                {% endif %}
+                {% for page in p_device_hiss.pages %}
+                    {% if page %}
+                        {% ifequal page p_device_hiss.number %}
+                            <li class="active"><a href="?{{ page.querystring }}#hist">{{ page }}</a></li>
+                        {% else %}
+                            <li><a href="?{{ page.querystring }}#hist">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% else %}
+                        <li>...</li>
+                    {% endif %}
+                {% endfor %}
+                {% if p_device_hiss.has_next %}
+                    <li><a href="?{{ p_device_hiss.next_page_number.querystring }}#hist">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
 {% endblock %}
 {% block custome_js %}
 
     <script>
-
+        function myFunction(val) {
+            var x = val;
+            var d1 = document.getElementById("vis1");
+            var d2 = document.getElementById("vis2");
+            if (x === '0'||x==='-1') {
+                d1.style.visibility = "hidden"
+                d2.style.visibility = "hidden"
+            }else{
+                d1.style.visibility = "visible"
+                d2.style.visibility = "visible"
+            }
+        }
         function btn_cancel() {
             location.href = "{% url 'devices:device_list' %}";
         }

@@ -4,7 +4,7 @@ from .models import Device, DeviceType
 
 
 class DeviceAdmin(admin.ModelAdmin):
-    pass
+    search_fileds = ['device_id','device_user','device_type__device_type']
 
 
 class DeviceTypeAdmin(admin.ModelAdmin):

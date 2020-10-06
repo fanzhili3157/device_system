@@ -22,7 +22,7 @@ class UserInfoForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['department', 'seat', 'mobile','email','isadmin']
+        fields = ['department', 'seat', 'mobile','email','isadmin','is_staff']
 
 
 # 定义添加，修改部门时表单验证

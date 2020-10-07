@@ -94,5 +94,11 @@
 {% endblock %}
 
 {% block custome_js %}
+    <script>
+    var btn_device_add = document.getElementById("btn_add");
+    btn_device_add.onclick=function () {
+        location.href = "{% url 'devices:device_add' %}"
+    }
+    </script>
 
 {% endblock %}

@@ -55,10 +55,10 @@
                 </select>
           </div>
             <div class="form-list" id="vis2" {% ifequal device.device_status '1'%}style="visibility: visible" {% else %}style="visibility: hidden"{% endifequal %}>
-                <span>预期结束使用</span><input {% if device_form.errors.expired_date %}class="input-error"{% endif %} type="date" name="expired_date" value="{{ device.expired_date }}"/>
+                <span>预期结束使用</span><input {% if device_form.errors.expired_date %}class="input-error"{% endif %} type="date" name="expired_date" value="{{ device.expired_date | date:"Y-m-d" }}"/>
             </div>
             <div class="form-list">
-                <span class="comment">备注</span><textarea class="textarea {% if device_form.errors.comment %}input-error{% endif %}" name="comment" ></textarea>
+                <span class="comment">备注</span><textarea class="textarea {% if device_form.errors.comment %}input-error{% endif %}" name="comment" >{{ device.comment }}</textarea>
             </div>
                 {% if msg %}
                     <div class="error">{{ msg }}</div>
@@ -70,9 +70,9 @@
                 <div class="form-list">
                      <button class="form-button" type="button" onclick="btn_cancel()">取消</button>
                 </div>
-                <div class="form-list">
-                     <button class="form-button form-button-del" type="button" onclick="btn_delete()">删除</button>
-                </div>
+{#                <div class="form-list">#}
+{#                     <button class="form-button form-button-del" type="button" onclick="btn_delete()">删除</button>#}
+{#                </div>#}
                 {% csrf_token %}
             </form>
         </div>

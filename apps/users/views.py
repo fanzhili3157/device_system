@@ -78,9 +78,9 @@ class UserListView(LoginRequiredMixin, View):
         if search:
             search = request.GET.get('search').strip()
             users = UserProfile.objects.filter(Q(username__icontains=search) | Q(department__department_name__icontains=search),
-                                               is_superuser=0).order_by('-is_staff')
+                                               is_superuser=0).order_by('-id')
         else:
-            users = UserProfile.objects.filter(is_superuser=0).order_by('-is_staff')
+            users = UserProfile.objects.filter(is_superuser=0).order_by('-id')
 
         # 分页功能实现
         try:

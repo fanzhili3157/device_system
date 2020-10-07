@@ -68,7 +68,7 @@ class DeviceListView(View):
                                             |Q(device_type__device_res__icontains=search))
 
         else:
-            devices = Device.objects.all()
+            devices = Device.objects.all().order_by('-id')
 
 
 
@@ -157,7 +157,7 @@ class DeviceDetailView(LoginRequiredMixin, View):
         device = Device.objects.filter(id=device_id).first()
         users = UserProfile.objects.filter(is_superuser=0, is_staff='1')
         device_types = DeviceType.objects.all()
-        device_his = DeviceHis.objects.filter(device_id_id=device_id)
+        device_his = DeviceHis.objects.filter(device_id_id=device_id).order_by('-id')
         #分页功能实现
         try:
             page = request.GET.get('page', 1)
@@ -422,8 +422,11 @@ def deviceLog(device_id,stat_pre,stat,current_user,next_user):
             modify_log()
 
         else:
-            modify_log()
-            create_log()
+            if current_user==next_user:
+                pass
+            else:
+                modify_log()
+                create_log()
 
 class DeviceMyListView(View):
     def get(self, request):

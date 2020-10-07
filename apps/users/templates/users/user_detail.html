@@ -19,7 +19,7 @@
                 <select {% if userinfo_form.errors.department %}class="input-error"{% endif %} name="department" >
                     <option style="display: none;" disabled selected>请选择</option>
                     {% for department in department_lists %}
-                        <option value="{{ department.id }}" >{{ department.department_name }}</option>
+                        <option value="{{ department.id }}" {% ifequal user.department_id department.id %} selected {% endifequal %}>{{ department.department_name }}</option>
                     {% endfor %}
                 </select>
             </div>

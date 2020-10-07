@@ -15,7 +15,7 @@ urlpatterns = [
     path('device/mylist/', DeviceMyListView.as_view(), name='device_mylist'),
     path('device/selectname/<device_id>/', DeviceSelectNameView.as_view(), name='select_name'),
     path('device/selecttime/<device_id>/', DeviceSelectTimeView.as_view(), name='select_time'),
-    #path('device/export/', DeviceExportView.as_view(), name='device_export'),
+
 
     # 资产类型url
     path('type/list/', TypeListView.as_view(), name='type_list'),

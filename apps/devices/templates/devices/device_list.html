@@ -18,7 +18,7 @@
         </div>
         {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
             <button class="button-insert" id="btn_add">添加设备</button>
-            <button class="button-insert" id="btn_export_list">导出列表</button>
+{#            <button class="button-insert" id="btn_export_list">导出列表</button>#}
             <text class="button-insert" id="btn_import_list">批量导入</text>
             <form method="post" action="{% url 'devices:device_import' %}" enctype="multipart/form-data">
             {% csrf_token %}
@@ -99,12 +99,6 @@
         btn_server_add.onclick = function () {
             location.href = "{% url 'devices:device_add' %}";
         };
-
-        {#var btn_export_list = document.getElementById("btn_export_list");#}
-        {#btn_export_list.onclick = function() {#}
-        {#    var search = document.getElementById("search").value;#}
-        {#    var url = "{% url 'devices:device_export' %}";#}
-        {#    location.href = url + '?search=' + search;#}
 
     </script>
 {% endblock %}

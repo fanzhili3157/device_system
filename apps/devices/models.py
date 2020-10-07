@@ -19,7 +19,6 @@ class DeviceType(models.Model):
 # 定义设备model
 class Device(models.Model):
     device_id = models.CharField(max_length=50, verbose_name='资产编号',unique=True)
-    #device_type = models.CharField(max_length=50, verbose_name='设备型号')
     device_type = models.ForeignKey(DeviceType,on_delete=models.DO_NOTHING,verbose_name="设备类型")
     buy_time = models.DateField(verbose_name='采购时间')
     device_mac = models.CharField(max_length=50, verbose_name='mac地址', null=True,blank=True)
@@ -50,7 +49,6 @@ class Device(models.Model):
 
 # 定义设备使用历史model
 class DeviceHis(models.Model):
-    #device_id = models.CharField(max_length=50, verbose_name='资产编号')
     device_id = models.ForeignKey(Device,on_delete=models.DO_NOTHING,verbose_name='设备id')
     device_user = models.ForeignKey(UserProfile,on_delete=models.DO_NOTHING,verbose_name="使用人")
     start_time = models.DateTimeField(default=datetime.now, verbose_name='开始时间')

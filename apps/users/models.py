@@ -34,20 +34,5 @@ class UserProfile(AbstractUser):
         return self.username
 
 
-# 定义用户操作日志模型
-# class UserOperateLog(models.Model):
-#     username = models.CharField(max_length=30, verbose_name='人员')
-#     scope = models.CharField(max_length=30, verbose_name='操作范围')
-#     type = models.CharField(max_length=30, verbose_name='操作类型')
-#     content = models.IntegerField(verbose_name='操作内容')
-#     modify_time = models.DateTimeField(default=datetime.now, verbose_name='操作时间')
-#
-#     class Meta:
-#         verbose_name = '操作日志'
-#         verbose_name_plural = verbose_name
-#
-#     def __str__(self):
-#         return self.username + '.' + self.type
-
 
 

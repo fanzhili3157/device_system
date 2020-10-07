@@ -193,28 +193,6 @@ class UserExportView(LoginRequiredMixin, View):
         return excel.make_response_from_query_sets(users, columns_names, 'xls', file_name='人员列表')
 
 
-# 操作日志视图(所有用户可见)
-# class UserOperateView(LoginRequiredMixin, View):
-#     def get(self, request):
-#         search = request.GET.get('search')
-#         if search:
-#             search = search.strip().upper()
-#             operate_logs = UserOperateLog.objects.filter(Q(username__icontains=search) | Q(scope__icontains=search)
-#                                                          | Q(type__icontains=search)).order_by('-modify_time')
-#         else:
-#             operate_logs = UserOperateLog.objects.all().order_by('-modify_time')
-#
-#         # 分页功能实现
-#         try:
-#             page = request.GET.get('page', 1)
-#         except PageNotAnInteger:
-#             page = 1
-#         p = Paginator(operate_logs, per_page=per_page, request=request)
-#         p_operate_logs = p.page(page)
-#         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
-#
-#         return render(request, 'users/operate_log.html', {'operate_logs': p_operate_logs, 'start': start,
-#                                                           'search': search})
 
 class DepartmentListView(LoginRequiredMixin,View):
     def get(self, request):
@@ -262,10 +240,7 @@ class DepartmentDetailView(LoginRequiredMixin,View):
 
 
 class DepartmentModifyView(LoginRequiredMixin,View):
-    # def get(self, request,department_id):
-    #     dep = Department.objects.get(id=department_id)
-    #     return render(request,'users/department_modify.html', {'department': dep})
-    #     return HttpResponseRedirect(reverse('users:department_modify'),department=dep)
+
     def post(self, request):
         department_form = DepartmentInfoForm(request.POST)
         department_id = int(request.POST.get('department_id'))

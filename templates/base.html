@@ -12,7 +12,7 @@
     <div class="nav">
         <div class="nav-left"></div>
         <div class="nav-right">
-            {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
+            {% if request.user.isadmin == '1' or request.user.isadmin == '0' %}
             <div class="nav-right-name">{{ request.user.username }}<i class="fa fa-caret-down" aria-hidden="true"></i>
                 <dl class="nav-right-signout">
                     <dd><a href="{% url 'users:user_pwd_modify' %}">修改密码</a></dd>
@@ -27,14 +27,17 @@
     </div>
     <div class="sidebar" id="sidebar">
         <ul class="collapsible collapsible-accordion">
-        {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
-                <li {% ifequal request.path '/' %}class="active-li"{% endifequal %}><a href="{% url 'index' %}"><span class="">设备统计</span></a></li>
-                <li {% ifequal request.path|slice:20 '/devices/device/list' %}class="active-li"{% endifequal %}><a href="{% url 'devices:device_list' %}"></i><span>设备列表</span></a></li>
+        <li {% ifequal request.path|slice:20 '/devices/device/list' %}class="active-li"{% endifequal %}><a href="{% url 'devices:device_list' %}"></i><span>设备列表</span></a></li>
+        {% if request.user.isadmin == '1' %}
+                <li {% ifequal request.path|slice:19 '/devices/device/sum' %}class="active-li"{% endifequal %}><a href="{% url 'devices:device_sum' %}"><span class="">设备统计</span></a></li>
                 <li {% ifequal request.path|slice:18 '/devices/type/list' %}class="active-li"{% endifequal %}><a href="{% url 'devices:type_list' %}"><span>设备类型</span></a></li>
                 <li {% ifequal request.path|slice:21 '/users/department/list' %}class="active-li"{% endifequal %}><a href="{% url 'users:department_list' %}"><span class="">部门管理</span></a></li>
                 <li {% ifequal request.path|slice:16 '/users/user/list' %}class="active-li"{% endifequal %}><a href="{% url 'users:user_list' %}"><span class="">用户管理</span></a></li>
 {#                <li {% ifequal request.path|slice:23 '/users/user/operate_log' %}class="active-li"{% endifequal %}><a href="{% url 'users:operate_log' %}"><i class="fa fa-book" aria-hidden="true"></i><span class="">日志记录</span></a></li>#}
             {% endif %}
+        {% if request.user.isadmin == '0' %}
+            <li {% ifequal request.path|slice:22 '/devices/device/mylist' %}class="active-li"{% endifequal %}><a href="{% url 'devices:device_mylist' %}"></i><span>我的设备</span></a></li>
+        {% endif %}
         </ul>
     </div>
     <div class="wrapper">

@@ -5,62 +5,64 @@ from django.urls import reverse
 from django.db.models import Q, Count
 from pure_pagination import Paginator, PageNotAnInteger
 from datetime import date
-
+from django.contrib.auth.hashers import make_password
 import xlrd
 import datetime
 
 from .models import Device, DeviceType, DeviceHis
 from .forms import DeviceForm, DeviceTypeForm,DeviceModifyForm,UploadExcelForm
-from users.models import UserProfile
+from users.models import UserProfile,Department
 from device_sys.settings import per_page
 from utils.mixin_utils import LoginRequiredMixin
 
+pwd='123456'
 
-# 定义首页视图
-class IndexView(View):
+# 定义统计视图
+class DeviceSumView(View):
     def get(self, request):
-        search = request.GET.get('search')
-        if search:
-            pass
-            # search = request.GET.get('search').strip()
-            # # 如果输入的是纯数字，则将序号也加入到搜索的列表中来
-            # try:
-            #     search_int = int(search)
-            #     devices = Device.objects.filter(Q(id=search_int) | Q(device_type__device_type__icontains=search)
-            #                                     | Q(device_brand__icontains=search) | Q(device_id__icontains=search)
-            #                                     | Q(device_user__icontains=search) | Q(device_status__icontains=search)
-            #                                     | Q(device_type__system__icontains=search) | Q(device_type__cpu__icontains=search)
-            #                                     | Q(device_type__men__icontains=search) | Q(device_type__res__icontains=search)). \
-            #         order_by('device_type', 'id')
-            # except Exception:
-            #     devices = Device.objects.filter(Q(device_type__device_type__icontains=search)
-            #                                     | Q(device_brand__icontains=search) | Q(device_id__icontains=search)
-            #                                     | Q(device_user__icontains=search) | Q(device_status__icontains=search)
-            #                                     | Q(device_type__system__icontains=search) | Q(device_type__cpu__icontains=search)
-            #                                     | Q(device_type__men__icontains=search) | Q(device_type__res__icontains=search)). \
-            #         order_by('device_type', 'id')
-        else:
-            devices = Device.objects.all()
 
-        # 分页功能实现
-        try:
-            page = request.GET.get('page', 1)
-        except PageNotAnInteger:
-            page = 1
-        p = Paginator(devices, per_page=per_page, request=request)
-        p_devices = p.page(page)
-        start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
-        return render(request, 'devices/device_list.html', {'p_devices': p_devices, 'start': start, 'search': search})
+        device_counts = DeviceHis.objects.values("device_id__device_type").annotate(counts=Count(id)).order_by('-counts')[:20]
+        device_list = []
+        device_count = []
+        for item in device_counts:
+            dev_id = item['device_id__device_type']
+            dev_count = item['counts']
+            dev_name = DeviceType.objects.filter(id=dev_id).first()
+
+
+            device_list.append(dev_name)
+            device_count.append(dev_count)
+        device_types = Device.objects.values("device_type").annotate(counts=Count(id)).order_by('-counts')[:20]
+        types_num = DeviceType.objects.all()
+        dict_dev = []
+        total = len(types_num)
+        other = total
+        for t in device_types:
+            dev_type = DeviceType.objects.filter(id=t['device_type']).first()
+            dev_type_name = dev_type.device_type
+            dict_dev.append([dev_type_name,t['counts']/total])
+            total -= t['counts']
+        dict_dev.append(['other',other/total])
+
+        print(dict_dev)
+
+        return render(request, 'devices/device_sum.html', {'device_list':device_list,
+                                                           'device_count':device_count,
+                                                           'dict_dev':dict_dev})
 
 # 设备列表
 class DeviceListView(View):
     def get(self, request):
         search = request.GET.get('search')
         if search:
-
+            dict_status = {'空闲':'0','占用':'1','损坏':'-1'}
             search = request.GET.get('search').strip()
+            if search in dict_status.keys():
+                search = dict_status[search]
+                devices = Device.objects.filter(device_status__icontains=search)
+            else:
 
-            devices = Device.objects.filter(Q(device_id__icontains=search)|Q(device_type__device_type__icontains=search)
+                devices = Device.objects.filter(Q(device_id__icontains=search)|Q(device_type__device_type__icontains=search)
                                             |Q(device_user__username__icontains=search)|Q(device_sys__icontains=search)
                                             |Q(device_men__icontains=search)|Q(device_type__device_system__icontains=search)
                                             |Q(device_type__device_res__icontains=search))
@@ -80,7 +82,8 @@ class DeviceListView(View):
         p_devices = p.page(page)
         print(p_devices)
         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
-        return render(request, 'devices/device_list.html', {'p_devices': p_devices,'start': start, 'search': search})
+        return render(request, 'devices/device_list.html', {'p_devices': p_devices,'start': start, 'search': search,'num':len(devices)})
+
 
 
 # 设备添加
@@ -199,7 +202,7 @@ class DeviceModifyView(LoginRequiredMixin, View):
         user_pre = device.device_user
         # 判断表单是否正确
 
-        print(device_form)
+
         if device_form.is_valid():
             device.device_mac = request.POST.get('device_mac').strip()
             device.device_root = request.POST.get('device_root').strip()
@@ -207,6 +210,7 @@ class DeviceModifyView(LoginRequiredMixin, View):
             device.device_sys = request.POST.get('device_sys').strip()
             device.device_men = request.POST.get('device_men').strip()
             device.comment = request.POST.get('comment').strip()
+            device.next_user = ''
             if device.device_status == '1':
                 if request.POST.get('device_user')  and request.POST.get('expired_date') :
 
@@ -274,15 +278,89 @@ class DeviceDeleteView(LoginRequiredMixin, View):
         return HttpResponseRedirect((reverse('devices:device_list')))
 
 class DeviceImportView(LoginRequiredMixin, View):
+
+
     def post(self,request):
+        dict_root = {'是': '1', '否': '0'}
+        dict_status = {'空闲': '0', '占用': '1', '损坏': '-1','':'0'}
         form = UploadExcelForm(request.POST,request.FILES)
         if form.is_valid():
             wb = xlrd.open_workbook(filename=None,file_contents=request.FILES['excel'].read())
             table = wb.sheets()[0]
             row  =table.nrows
-            for i in (1,row):
-                col = table.row_value(i)
-                print(col)
+            for i in range(1,row):
+
+                col = table.row_values(i)
+                device_type = str(col[1])
+                device_id = str(col[3])
+                device_root = dict_root[str(col[4])]
+                department_name = str(col[5])
+                device_user = str(col[6])
+
+                device_status = dict_status[str(col[8])]
+
+
+                #borrow_date = xlrd.xldate_as_datetime(col[7], 0).strftime('%Y-%m-%d') if device_status=='1' else None
+
+
+                comment = str(col[9])
+                device_sys = str(col[10])
+                device_cpu = str(col[11])
+                device_men = str(col[12])
+                device_res = str(col[13])
+                device_mac = str(col[14])
+                try:
+                    buy_time = xlrd.xldate_as_datetime(col[15],0).strftime('%Y-%m-%d')
+                except:
+                    buy_time=datetime.datetime.now()
+
+
+                dev = Device.objects.filter(device_id=device_id)
+                if not dev:
+
+                    devicetype = DeviceType.objects.filter(device_type=device_type).first()
+
+                    if devicetype:
+                    #device_type = DeviceType.objects.filter(device_type=device_type).first()
+                        pass
+                    else:
+                        print(device_type)
+                        print(device_cpu)
+                        print(device_res)
+                        devicetype = DeviceType(device_type=device_type,device_cpu=device_cpu,device_res=device_res)
+                        devicetype.save()
+
+
+                    if device_status == '1':
+                        department = Department.objects.filter(department_name=department_name).first()
+                        if department:
+                            pass
+                        else:
+                            department = Department(department_name = department_name)
+                            department.save()
+
+                        user = UserProfile.objects.filter(username=device_user).first()
+                        if user:
+                            pass
+                        else:
+                            user = UserProfile(username=device_user,department=department,password=make_password(pwd),isadmin='0',is_staff='1')
+                            user.save()
+
+                        device = Device(device_id=device_id,device_type=devicetype,buy_time=buy_time,
+                                    device_mac=device_mac,device_sys=device_sys,device_root=device_root,device_men=device_men,
+                                    device_status=device_status,device_user=user,comment=comment)
+                        device.save()
+
+                        deviceLog(device, '0', device_status, 0, device.device_user)
+                    else:
+                        admin_user = UserProfile.objects.filter(isadmin='1').first()
+                        device = Device(device_type=devicetype, device_id=device_id, buy_time=buy_time,
+                               device_mac=device_mac, device_root=device_root,device_sys=device_sys,device_men=device_men,
+                               device_status=device_status, device_user=admin_user,comment=comment)
+                        device.save()
+                else:
+                    pass
+
         return HttpResponseRedirect((reverse('devices:device_list')))
 # # 设备列表导出
 # class deviceExportView(LoginRequiredMixin, View):
@@ -414,9 +492,10 @@ def deviceLog(device_id,stat_pre,stat,current_user,next_user):
 
     def modify_log():
         device_log = DeviceHis.objects.filter(device_id=device_id, device_user=current_user, is_going='1').first()
-        device_log.end_time = datetime.datetime.now()
-        device_log.is_going = '0'
-        device_log.save()
+        if device_log:
+            device_log.end_time = datetime.datetime.now()
+            device_log.is_going = '0'
+            device_log.save()
 
     if stat_pre =='0' or stat_pre=='-1':
         if stat =='1': #case1 新建一条记录
@@ -430,6 +509,64 @@ def deviceLog(device_id,stat_pre,stat,current_user,next_user):
             modify_log()
             create_log()
 
+class DeviceMyListView(View):
+    def get(self, request):
+        current_user = request.user
+
+        devices = Device.objects.filter(Q(device_user=current_user)|Q(next_user=current_user.username))
 
 
 
+        # 分页功能实现
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(devices, per_page=per_page, request=request)
+        p_devices = p.page(page)
+        print(p_devices)
+        start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
+        return render(request, 'devices/device_my.html', {'p_devices': p_devices,'start': start, 'num':len(devices),
+                                                          'current_user':current_user})
+
+class DeviceSelectNameView(LoginRequiredMixin, View):
+    def get(self, request,device_id):
+        current_user = request.user
+        users = UserProfile.objects.filter(~Q(username=current_user) & Q(isadmin='0'))
+
+        return render(request, 'devices/select_user.html', {'users': users,'device_id':device_id})
+
+    def post(self, request,device_id):
+
+        device_id = device_id
+
+        device_user = request.POST.get('device_user').strip()
+        user_name = UserProfile.objects.filter(id=device_user).first()
+        device = Device.objects.filter(id=device_id).first()
+        device.next_user = user_name.username
+        device.save()
+
+        return HttpResponseRedirect((reverse('devices:device_mylist')))
+
+class DeviceSelectTimeView(LoginRequiredMixin, View):
+    def get(self, request,device_id):
+
+        return render(request, 'devices/select_time.html', {'device_id':device_id})
+
+    def post(self, request,device_id):
+
+        user = request.user
+        device_id = device_id
+        expired_date = request.POST.get('expired_date').strip()
+
+        device = Device.objects.filter(id=device_id).first()
+        pre_user = device.device_user
+        print(pre_user)
+        device.device_user = user
+        device.next_user = ''
+        device.expired_date = expired_date
+        device.save()
+
+        deviceLog(device, '1', '1', pre_user, user)
+
+        return HttpResponseRedirect((reverse('devices:device_mylist')))

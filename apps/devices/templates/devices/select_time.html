@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}选择时间{% endblock %}
+{% block custome_css %}
+    <link rel="stylesheet" href="{% static 'devices/css/device-add.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <p class="content-note1">选择预期结束使用时间<span class="content-note2"> </span></p>
+        <div style="clear:both"></div>
+        <form class="form-table" action="{% url 'devices:select_time' device_id%}" method="post">
+
+
+            <div class="form-list" id="vis2">
+                <span>预期结束使用</span><input type="date" name="expired_date" />
+            </div>
+            {% if msg %}
+                <div class="error">{{ msg }}</div>
+            {% endif %}
+            <div style="clear:both"></div>
+            <div class="form-list">
+                <input class="form-button" type="submit"/>
+            </div>
+            <div class="form-list">
+                 <button class="form-button" type="button" onclick="btn_cancel()">取消</button>
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+{% endblock %}
+{% block custome_js %}
+
+{% endblock %}

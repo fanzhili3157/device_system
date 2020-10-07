@@ -73,7 +73,7 @@ class DeviceRequest(models.Model):
     device_id = models.ForeignKey(Device, on_delete=models.DO_NOTHING,verbose_name='资产编号')
     device_req = models.ForeignKey(UserProfile,on_delete=models.DO_NOTHING,verbose_name="申请人",null=True)
     expired_date = models.DateField(verbose_name='预计结束时间')
-
+    duration = models.DurationField
     class Meta:
         verbose_name = '设备使用历史表'
         verbose_name_plural = verbose_name

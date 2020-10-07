@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}选择用户{% endblock %}
+{% block custome_css %}
+    <link rel="stylesheet" href="{% static 'devices/css/device-add.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <p class="content-note1">选择设备接收人<span class="content-note2"> </span></p>
+        <div style="clear:both"></div>
+        <form class="form-table" action="{% url 'devices:select_name' device_id%}" method="post">
+
+
+             <div class="form-list" id="vis1">
+                <span>接收人</span><select name="device_user"/>
+                 <option style="display: none;" disabled selected>请选择</option>
+                    {% for user in users %}
+                        <option value="{{ user.id  }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if msg %}
+                <div class="error">{{ msg }}</div>
+            {% endif %}
+            <div style="clear:both"></div>
+            <div class="form-list">
+                <input class="form-button" type="submit"/>
+            </div>
+            <div class="form-list">
+                 <button class="form-button" type="button" onclick="btn_cancel()">取消</button>
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+{% endblock %}
+{% block custome_js %}
+
+{% endblock %}

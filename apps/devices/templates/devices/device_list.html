@@ -20,13 +20,13 @@
             <button class="button-insert" id="btn_add">添加设备</button>
             <button class="button-insert" id="btn_export_list">导出列表</button>
             <text class="button-insert" id="btn_import_list">批量导入</text>
-            <form method="post" action="{% url 'devices:device_import' %}">
+            <form method="post" action="{% url 'devices:device_import' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="file" name="excel"><input type="submit" value="确定">
             </form>
         {% endif %}
         <br/><br/>
-    <p>共计{{ p_devices.object_list|length }}条记录</p>
+        <p>共计{{ num }}条记录</p>
         <table class="table-list">
             <thead>
                 <tr>
@@ -37,7 +37,7 @@
                     <th>使用人</th>
                     <th>预计结束使用时间</th>
                     <th>备注信息</th>
-                    <th>操作</th>
+{#                    <th>操作</th>#}
                 </tr>
             </thead>
             <tbody>
@@ -45,22 +45,26 @@
                     <tr>
                         <td>{{ forloop.counter|add:start }}</td>
 {#                        <td>{{ device.id }}</td>#}
-                        {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
+                        {% if request.user.isadmin == '1'%}
                             <td><div class="tooltip"><a href="{% url 'devices:device_detail' device.id %}">{{ device.device_id }}</a>
                                 <span class="tooltiptext">系统：{{ device.device_sys }}<br>内存：{{ device.device_men }}<br>Mac地址：{{ device.device_mac }}<br>
                                 Root/越狱：{{ device.get_device_root_display }}<br>采购日期：{{ device.buy_time }}<br>cpu：{{ device.device_type.device_cpu }}<br>
                                     屏幕信息：{{ device.device_type.device_res }}
                                 </span></div></td>
                         {% else %}
-                            <td>{{ device.device_id }}</td>
+                           <td><div class="tooltip">{{ device.device_id }}
+                                <span class="tooltiptext">系统：{{ device.device_sys }}<br>内存：{{ device.device_men }}<br>Mac地址：{{ device.device_mac }}<br>
+                                Root/越狱：{{ device.get_device_root_display }}<br>采购日期：{{ device.buy_time }}<br>cpu：{{ device.device_type.device_cpu }}<br>
+                                    屏幕信息：{{ device.device_type.device_res }}
+                                </span></div></td>
                         {% endif %}
                         <td>{{ device.device_type }}</td>
                         <td>{{ device.get_device_status_display }}</td>
-                        <td><div class="tooltip">{{ device.device_user | default_if_none:""}}<span class="tooltiptext">部门：{{ device.device_user.department }}<br>工位：{{ device.device_usr.seat }}<br>
+                        <td><div class="tooltip">{{ device.device_user | default_if_none:""}}<span class="tooltiptext">部门：{{ device.device_user.department }}<br>工位：{{ device.device_user.seat }}<br>
                             联系方式：{{ device.device_user.mobile }}<br>邮箱：{{ device.device_user.email }}<br></span></div></td>
                         <td>{{ device.expired_date | date:"Y-m-d" |default_if_none:""}}</td>
                         <td><div class="more-text">{{ device.comment }}</div></td>
-                        <td></td>
+{#                        <td></td>#}
                     </tr>
                 {% endfor %}
             </tbody>

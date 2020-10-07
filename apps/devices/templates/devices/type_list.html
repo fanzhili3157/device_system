@@ -17,7 +17,7 @@
         </div>
         <button class="button-insert" id="btn_add">添加类型</button>
         <br/><br/>
-        <p>共计{{ p_device_types.object_list|length }}条记录</p>
+
         <table class="table-list">
             <thead>
                 <tr>
@@ -41,6 +41,28 @@
                 {% endfor %}
             </tbody>
         </table>
+         <div class="page">
+            <ul class="pagination">
+                {% if p_device_types.has_previous %}
+                    <li><a href="?{{ p_device_types.previous_page_number.querystring }}">&laquo;</a></li>
+                {% endif %}
+                {% for page in p_device_types.pages %}
+                    {% if page %}
+                        {% ifequal page p_device_types.number %}
+                            <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                        {% else %}
+                            <li><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% else %}
+                        <li>...</li>
+                    {% endif %}
+                {% endfor %}
+                {% if p_device_types.has_next %}
+                    <li><a href="?{{ p_device_types.next_page_number.querystring }}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
     </div>
 {% endblock %}
 {% block custome_js %}

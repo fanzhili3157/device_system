@@ -1,28 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}设备管理 - 设备列表{% endblock %}
-{% block custome_css %}{% endblock %}
+{% block custome_css %}
+    <link rel="stylesheet" href="{% static 'devices/css/tooltip.css' %}">
+
+{% endblock %}
 {% block content %}
     <div class="content">
-        <p>设备列表</p>
-        <div class="form-class">
-            <form action="" method="get">
-                <input id="search" class="form-text" type="text" placeholder="搜索..." name="search" value="{% if search %}{{ search }}{% endif %}"/>
-                <button class="form-submit" type="submit">
-                    <i class='fa fa-search' aria-hidden='true'></i>
-                </button>
-            </form>
-        </div>
-        {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
-            <button class="button-insert" id="btn_add">添加设备</button>
-            <button class="button-insert" id="btn_adds">批量导入</button>
-            <button class="button-insert" id="btn_export_list">导出列表</button>
-        {% endif %}
+        <p>与我相关的设备：共计{{ num }}条记录</p>
         <br/><br/>
+
         <table class="table-list">
             <thead>
                 <tr>
-                    <th>序号</th>
+                    <th><div class="tooltip">序号  <span class="tooltiptext">Tooltip text</span></div></th>
                     <th>设备编号</th>
                     <th>设备类型</th>
                     <th>设备状态</th>
@@ -35,19 +26,28 @@
             <tbody>
                 {% for device in p_devices.object_list %}
                     <tr>
-{#                        <td>{{ forloop.counter|add:start }}</td>#}
-                        <td>{{ device.id }}</td>
-                        {% if request.user.isadmin == '1' or request.user.is_superuser == 1 %}
-                            <td><a href="{% url 'device:device_detail' device.id %}">{{ device.device_id }}</a></td>
-                        {% else %}
+                        <td>{{ forloop.counter|add:start }}</td>
+{#                        <td>{{ device.id }}</td>#}
+
+
                             <td>{{ device.device_id }}</td>
-                        {% endif %}
+
                         <td>{{ device.device_type }}</td>
-                        <td>{{ device.device_status }}</td>
-                        <td></td>
-                        <td></td>
+                        <td>{{ device.get_device_status_display }}</td>
+                        <td>{{ device.device_user}}</td>
+
+                        <td>{{ device.expired_date | date:"Y-m-d" |default_if_none:""}}</td>
                         <td><div class="more-text">{{ device.comment }}</div></td>
-                        <td></td>
+                        <td>{% if device.next_user %}
+                                {% ifequal device.next_user current_user.username %}
+                                    {{ device.device_user }}转给你<a href="{% url 'devices:select_time' device.id %}"><button>确认接收</button></a>
+                                {% else %}
+                                等待{{ device.next_user }}确认
+                                {% endifequal %}
+                            {% else %}
+                            <a href="{% url 'devices:select_name' device.id %}"><button>转给他人</button></a>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -77,17 +77,5 @@
 {% endblock %}
 
 {% block custome_js %}
-    <script>
-        var btn_server_add = document.getElementById("btn_add");
-        btn_server_add.onclick = function () {
-            location.href = "{% url 'devices:device_add' %}";
-        };
 
-        {#var btn_export_list = document.getElementById("btn_export_list");#}
-        {#btn_export_list.onclick = function() {#}
-        {#    var search = document.getElementById("search").value;#}
-        {#    var url = "{% url 'devices:device_export' %}";#}
-        {#    location.href = url + '?search=' + search;#}
-
-    </script>
 {% endblock %}

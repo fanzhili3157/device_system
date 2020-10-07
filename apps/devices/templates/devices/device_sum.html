@@ -1,0 +1,97 @@
+{#{% extends 'base.html' %}#}
+{% load static %}
+{% block title %}设备统计{% endblock %}
+
+{% block custome_js %}
+        <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
+        <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+        <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+
+    <div class="wrapper" id="container" style="width:1000px;height:500px;margin-left:20%;position: relative" ></div>
+    <script type="text/javascript">
+    var chart = Highcharts.chart('container',{
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: '设备使用次数前20名'
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories:[
+            {% for device in device_list %}
+            "{{ device }}",
+            {% endfor %}
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '次数'
+        }
+    },
+    tooltip: {
+        // head + 每个 point + footer 拼接成完整的 table
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f} 次</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: '',
+        data: {{ device_count }},
+    }]
+});
+</script>
+        <div id="container2" style="min-width:400px;height:400px;position: relative" ></div>
+        <script>
+        Highcharts.chart('container2', {
+		chart: {
+				plotBackgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				type: 'pie'
+		},
+		title: {
+				text: '机型占比'
+		},
+		tooltip: {
+				pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+		},
+		plotOptions: {
+				pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+								style: {
+										color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+								}
+						}
+				}
+		},
+		series: [{
+				name: '机型',
+				colorByPoint: true,
+				data: [{% for d in dict_dev %}
+				    {
+						name: "{{ d.0}}",
+						y: {{ d.1 }},
+				    },
+                    {% endfor %}
+				]
+		}]
+});
+    </script>
+{% endblock %}

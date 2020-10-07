@@ -101,7 +101,7 @@ class UserAddView(LoginRequiredMixin, View):
 
     def post(self, request):
         userinfo_form = UserInfoForm(request.POST)
-        #print(userinfo_form)
+
         if userinfo_form.is_valid():
             username = request.POST.get('username').strip()
             department = Department.objects.filter(id=request.POST.get('department',0)).first()
@@ -244,7 +244,8 @@ class DepartmentModifyView(LoginRequiredMixin,View):
     def post(self, request):
         department_form = DepartmentInfoForm(request.POST)
         department_id = int(request.POST.get('department_id'))
-        #print("dep id is:",department_id)
+
+
         department = Department.objects.get(id=department_id)
         if department_form.is_valid():
             department_name = request.POST.get('department_name').strip()

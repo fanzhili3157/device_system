@@ -79,7 +79,7 @@ class DeviceListView(View):
             page = 1
         p = Paginator(devices, per_page=per_page, request=request)
         p_devices = p.page(page)
-        print(p_devices)
+
         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
         return render(request, 'devices/device_list.html', {'p_devices': p_devices,'start': start, 'search': search,'num':len(devices)})
 
@@ -94,7 +94,6 @@ class DeviceAddView(LoginRequiredMixin, View):
 
     def post(self, request):
         device_form = DeviceForm(request.POST)
-        print(device_form)
         # 判断表单是否正确
         if device_form.is_valid():  #更新设备表
             device_id = request.POST.get('device_id').strip()
@@ -280,9 +279,6 @@ class DeviceImportView(LoginRequiredMixin, View):
                     #device_type = DeviceType.objects.filter(device_type=device_type).first()
                         pass
                     else:
-                        print(device_type)
-                        print(device_cpu)
-                        print(device_res)
                         devicetype = DeviceType(device_type=device_type,device_cpu=device_cpu,device_res=device_res)
                         devicetype.save()
 
@@ -444,7 +440,7 @@ class DeviceMyListView(View):
             page = 1
         p = Paginator(devices, per_page=per_page, request=request)
         p_devices = p.page(page)
-        print(p_devices)
+
         start = (int(page)-1) * per_page  # 避免分页后每行数据序号从1开始
         return render(request, 'devices/device_my.html', {'p_devices': p_devices,'start': start, 'num':len(devices),
                                                           'current_user':current_user})
@@ -481,7 +477,7 @@ class DeviceSelectTimeView(LoginRequiredMixin, View):
 
         device = Device.objects.filter(id=device_id).first()
         pre_user = device.device_user
-        print(pre_user)
+
         device.device_user = user
         device.next_user = ''
         device.expired_date = expired_date

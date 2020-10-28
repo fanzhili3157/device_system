@@ -44,7 +44,6 @@ class DeviceSumView(View):
             total -= t['counts']
         dict_dev.append(['other',other/total])
 
-        print(dict_dev)
 
         return render(request, 'devices/device_sum.html', {'device_list':device_list,
                                                            'device_count':device_count,
